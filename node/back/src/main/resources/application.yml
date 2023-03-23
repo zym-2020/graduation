@@ -10,3 +10,10 @@ spring:
       max-request-size: 50MB
 server:
   port: 8888
+
+
+thread-pool:
+  core_pool_size: 5
+  max_pool_size: 5
+  queue_capacity: 99999
+  prefix: t-pool-
