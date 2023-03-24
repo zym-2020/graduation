@@ -22,15 +22,27 @@ public class ReceiveRealTimeDataController {
     @Autowired
     ReceiveRealTimeDataService receiveRealTimeDataService;
 
-    @RequestMapping(value = "/startTCPServer/{port}", method = RequestMethod.POST)
-    public JsonResult startTCPServer(@PathVariable int port) {
-        receiveRealTimeDataService.startTCPServer(port);
+    @RequestMapping(value = "/startTCPServer/{port}/{deviceId}", method = RequestMethod.POST)
+    public JsonResult startTCPServer(@PathVariable int port, @PathVariable String deviceId) throws InterruptedException {
+        receiveRealTimeDataService.startTCPServer(port, deviceId);
         return ResultUtils.success();
     }
 
     @RequestMapping(value = "/stopTCPServer/{port}", method = RequestMethod.POST)
     public JsonResult stopTCPServer(@PathVariable int port) {
         receiveRealTimeDataService.stopTCPServer(port);
+        return ResultUtils.success();
+    }
+
+    @RequestMapping(value = "/startUDPServer/{port}", method = RequestMethod.POST)
+    public JsonResult startUDPServer(@PathVariable int port) {
+        receiveRealTimeDataService.startUDPServer(port);
+        return ResultUtils.success();
+    }
+
+    @RequestMapping(value = "/stopUDPServer/{port}", method = RequestMethod.POST)
+    public JsonResult stopUDPServer(@PathVariable int port) {
+        receiveRealTimeDataService.stopUDPServer(port);
         return ResultUtils.success();
     }
 }

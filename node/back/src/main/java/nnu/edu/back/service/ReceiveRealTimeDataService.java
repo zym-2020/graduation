@@ -8,7 +8,11 @@ package nnu.edu.back.service;
  * @Description:
  */
 public interface ReceiveRealTimeDataService {
-    void startTCPServer(int port);
+    void startTCPServer(int port, String deviceId) throws InterruptedException;
 
     void stopTCPServer(int port);
+
+    void startUDPServer(int port);
+
+    void stopUDPServer(int port);
 }

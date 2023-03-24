@@ -22,6 +22,12 @@ public class BootNettyChannelInitializer<SocketChannel> extends ChannelInitializ
 
     public static long ALL_TIME_OUT = 60;
 
+    private String config;
+
+    public BootNettyChannelInitializer(String config) {
+        this.config = config;
+    }
+
     @Override
     protected void initChannel(Channel channel) throws Exception {
 
@@ -35,6 +41,6 @@ public class BootNettyChannelInitializer<SocketChannel> extends ChannelInitializ
         channel.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
 
         //自定义ChannelInboundHandlerAdapter
-        channel.pipeline().addLast(new BootNettyChannelInboundHandlerAdapter());
+        channel.pipeline().addLast(new BootNettyChannelInboundHandlerAdapter(this.config));
     }
 }

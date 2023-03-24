@@ -20,12 +20,15 @@ import org.springframework.stereotype.Component;
  * @Description:
  */
 
-@Component
 public class TCPServer {
-    private  final Logger log =  LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Channel currentChannel;
+    private String config;
 
+    public TCPServer(String config) {
+        this.config = config;
+    }
 
     public void bind(int port) throws InterruptedException {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -37,7 +40,7 @@ public class TCPServer {
             serverBootstrap = serverBootstrap.option(ChannelOption.SO_BACKLOG, 64);
             serverBootstrap = serverBootstrap.childOption(ChannelOption.TCP_NODELAY, true);
             serverBootstrap = serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
-            serverBootstrap = serverBootstrap.childHandler(new BootNettyChannelInitializer<SocketChannel>());
+            serverBootstrap = serverBootstrap.childHandler(new BootNettyChannelInitializer<SocketChannel>(this.config));
             ChannelFuture f = serverBootstrap.bind(port).sync();
             currentChannel = f.channel();
             if (f.isSuccess()) {

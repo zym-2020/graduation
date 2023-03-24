@@ -3,7 +3,13 @@ package nnu.edu.back.netty;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import lombok.NoArgsConstructor;
+import nnu.edu.back.common.utils.HandleRealTimeDataUtil;
+import nnu.edu.back.common.utils.XmlUtil;
+import nnu.edu.back.proj.config.DeviceConfig;
+import nnu.edu.back.proj.config.Push;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 
 /**
@@ -15,6 +21,28 @@ import java.net.InetSocketAddress;
  */
 @ChannelHandler.Sharable
 public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandlerAdapter {
+
+    private String config;
+    private static String datagramPath = "D:/zhuomian/毕业/node-manage/datagram/";
+
+    public BootNettyChannelInboundHandlerAdapter(String config) {
+        this.config = config;
+    }
+
+    private void handleMethod(String data, String clientAddress, String clientPort) throws Exception {
+        File file = new File(this.config);
+        if (!file.exists()) {
+            throw new Exception();
+        }
+        DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
+        if (deviceConfig.getPush() != null) {
+            Push push = deviceConfig.getPush();
+            HandleRealTimeDataUtil.normalHandle(datagramPath + deviceConfig.getId() + ".xml", push.getPort(), push.getProtocol(), clientAddress, clientPort, data);
+        }
+
+        
+    }
+
     /**
      * 注册时执行
      *
@@ -48,7 +76,10 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
         String data = (String) msg;
         String channelId = ctx.channel().id().toString();
         System.out.println("channelId=" + channelId + "data=" + data);
+        InetSocketAddress inSocket = (InetSocketAddress) ctx.channel().remoteAddress();
+        handleMethod(data, inSocket.getAddress().toString().replace("/", ""), String.valueOf(inSocket.getPort()));
     }
+
 
     /**
      * 从客户端收到新的数据，读取完成后调用
@@ -56,6 +87,7 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         super.channelReadComplete(ctx);
+        ctx.flush();
     }
 
     /**
