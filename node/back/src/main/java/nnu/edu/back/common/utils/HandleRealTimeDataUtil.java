@@ -23,14 +23,14 @@ public class HandleRealTimeDataUtil {
     * @Author: Yiming
     * @Date: 2023/3/24
     */
-    public static void normalHandle(String fileName, String listen, String type, String address, String port, String data) throws Exception {
+    public static void normalHandle(String fileName, String id, String listen, String type, String address, String port, String data) throws Exception {
         File file = new File(fileName);
         if (!file.exists()) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
             List<DatagramMessage> messages = new ArrayList<>();
             messages.add(new DatagramMessage(address, port, timeFormat.format(new Date()), data));
-            Datagram datagram = new Datagram(type, listen, dateFormat.format(new Date()), messages);
+            Datagram datagram = new Datagram(id, type, listen, dateFormat.format(new Date()), messages);
             try {
                 String content = XmlUtil.toXml(datagram);
                 FileUtil.writeFile(fileName, content);

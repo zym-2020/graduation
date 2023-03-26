@@ -11,6 +11,8 @@ import nnu.edu.back.proj.config.Push;
 
 import java.io.File;
 import java.net.InetSocketAddress;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,10 +39,9 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
         DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
         if (deviceConfig.getPush() != null) {
             Push push = deviceConfig.getPush();
-            HandleRealTimeDataUtil.normalHandle(datagramPath + deviceConfig.getId() + ".xml", push.getPort(), push.getProtocol(), clientAddress, clientPort, data);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            HandleRealTimeDataUtil.normalHandle(datagramPath + deviceConfig.getId() + "/" + dateFormat.format(new Date()) + ".xml", deviceConfig.getId(), push.getPort(), push.getProtocol(), clientAddress, clientPort, data);
         }
-
-        
     }
 
     /**

@@ -4,6 +4,8 @@ import com.thoughtworks.xstream.XStream;
 import nnu.edu.back.common.exception.MyException;
 import nnu.edu.back.proj.config.DeviceConfig;
 import nnu.edu.back.proj.datagram.Datagram;
+import nnu.edu.back.proj.typingData.TypingData;
+import nnu.edu.back.proj.typingFile.TypingFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +31,7 @@ public class XmlUtil {
     public static <T> T fromXml(InputStream is, Class<T> target) {
         XStream xStream = new XStream();
         XStream.setupDefaultSecurity(xStream);
-        xStream.allowTypes(new Class[]{Datagram.class, DeviceConfig.class});
+        xStream.allowTypes(new Class[]{Datagram.class, DeviceConfig.class, TypingData.class, TypingFile.class});
         xStream.processAnnotations(target);
         return (T) xStream.fromXML(is);
     }
@@ -37,7 +39,7 @@ public class XmlUtil {
     public static <T> T fromXml(File file, Class<T> target) {
         XStream xStream = new XStream();
         XStream.setupDefaultSecurity(xStream);
-        xStream.allowTypes(new Class[]{Datagram.class, DeviceConfig.class});
+        xStream.allowTypes(new Class[]{Datagram.class, DeviceConfig.class, TypingData.class, TypingFile.class});
         xStream.processAnnotations(target);
         return (T) xStream.fromXML(file);
     }
@@ -45,7 +47,7 @@ public class XmlUtil {
     public static <T> T fromXml(String xml, Class<T> target) {
         XStream xStream = new XStream();
         XStream.setupDefaultSecurity(xStream);
-        xStream.allowTypes(new Class[]{Datagram.class, DeviceConfig.class});
+        xStream.allowTypes(new Class[]{Datagram.class, DeviceConfig.class, TypingData.class, TypingFile.class});
         xStream.processAnnotations(target);
         return (T) xStream.fromXML(xml);
     }

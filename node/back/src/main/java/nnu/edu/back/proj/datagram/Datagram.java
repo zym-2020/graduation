@@ -21,6 +21,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Datagram {
+    @XStreamAlias("id")
+    @XStreamAsAttribute
+    private String id;
+
 
     @XStreamAlias("type")
     @XStreamAsAttribute
