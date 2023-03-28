@@ -2,7 +2,7 @@
   <div class="left-menu-bar">
     <div class="logo">
       <div class="image">
-        <img src="favicon copy.ico" />
+        <img src="/favicon copy.ico" />
       </div>
       <div class="text">
         <strong>实时水情数据<br />管理系统</strong>
@@ -19,14 +19,19 @@
         <el-icon><HomeFilled /></el-icon>
         <span>首页</span>
       </el-menu-item>
-      <el-sub-menu index="2">
+      <!-- <el-sub-menu index="2">
         <template #title>
           <el-icon><Setting /></el-icon>
           <span>挂载设备</span>
         </template>
-        <el-menu-item index="1-4-1">item one</el-menu-item>
-      </el-sub-menu>
-
+        <el-menu-item index="2-1">实时推送</el-menu-item>
+        <el-menu-item index="2-2">手动输入</el-menu-item>
+        <el-menu-item index="2-3">定时捞取</el-menu-item>
+      </el-sub-menu> -->
+      <el-menu-item index="2">
+        <el-icon><Setting /></el-icon>
+        <span>挂载设备</span>
+      </el-menu-item>
       <el-menu-item index="3">
         <el-icon><Tickets /></el-icon>
         <span>注册设备</span>
@@ -53,6 +58,8 @@ export default defineComponent({
         switch (router.currentRoute.value.name) {
           case "Home":
             return "1";
+          case "AddDevice":
+            return "2";
           case "RegisterDevice":
             return "3";
           case "SubscribeDevice":
@@ -69,6 +76,9 @@ export default defineComponent({
       switch (key) {
         case "1":
           router.push({ path: "/" });
+          break;
+        case "2":
+          router.push({ path: "/addDevice" });
           break;
         case "3":
           router.push({ path: "/registerDevice" });

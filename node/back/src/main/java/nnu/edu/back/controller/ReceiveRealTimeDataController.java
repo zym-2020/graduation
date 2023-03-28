@@ -63,4 +63,15 @@ public class ReceiveRealTimeDataController {
         receiveRealTimeDataService.typingFileMerge(tempId, deviceId, fileCount, fileName);
         return ResultUtils.success();
     }
+
+    /**
+    * @Description:查看端口是否被占用
+    * @Author: Yiming
+    * @Date: 2023/3/27
+    */
+    @RequestMapping(value = "/checkPort/{port}", method = RequestMethod.GET)
+    public JsonResult checkPort(@PathVariable int port) {
+        return ResultUtils.success(receiveRealTimeDataService.checkPort(port));
+    }
+
 }

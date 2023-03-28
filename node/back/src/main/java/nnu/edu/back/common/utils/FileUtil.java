@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -72,6 +73,29 @@ public class FileUtil {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    /**
+    * @Description:上传图片
+    * @Author: Yiming
+    * @Date: 2023/3/27
+    */
+    public static void uploadPicture(MultipartFile file, String pictureAddress) {
+        try {
+            InputStream is = file.getInputStream();
+            OutputStream os = new FileOutputStream(pictureAddress);
+            byte[] bytes = new byte[1024];
+            int len;
+            while ((len = is.read(bytes)) != -1) {
+                os.write(bytes, 0, len);
+            }
+            os.flush();
+            os.close();
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static boolean deleteFileOrFolder(File file) {

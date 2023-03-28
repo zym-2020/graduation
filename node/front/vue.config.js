@@ -1,6 +1,6 @@
 const { resolve } = require("path");
 module.exports = {
-  publicPath: "./",
+  publicPath: "/",
   devServer: {
     host: "0.0.0.0",
     port: 7777,

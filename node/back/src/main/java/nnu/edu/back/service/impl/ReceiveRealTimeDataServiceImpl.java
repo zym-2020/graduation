@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -189,6 +190,18 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
         } else {
             FileUtil.deleteFileOrFolder(new File(tempPath + tempId));
             throw new MyException(ResultEnum.CONFIG_ERROR);
+        }
+    }
+
+    @Override
+    public int checkPort(int port) {
+        String host = "localhost";
+        try {
+            Socket socket = new Socket(host, port);
+            socket.close();
+            return -1;
+        } catch (Exception e) {
+            return 0;
         }
     }
 }

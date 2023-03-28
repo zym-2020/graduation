@@ -25,4 +25,6 @@ public interface ReceiveRealTimeDataService {
     void typingFileUpload(String tempId, MultipartFile multipartFile, String fileName);
 
     void typingFileMerge(String tempId, String deviceId, int count, String fileName);
+
+    int checkPort(int port);
 }
