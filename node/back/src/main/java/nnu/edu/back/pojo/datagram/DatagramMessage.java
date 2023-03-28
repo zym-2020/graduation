@@ -1,25 +1,25 @@
-package nnu.edu.back.proj.config;
+package nnu.edu.back.pojo.datagram;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nnu.edu.back.common.utils.ParameterConverter;
+import nnu.edu.back.common.utils.DatagramMessageConverter;
 
 /**
  * Created with IntelliJ IDEA.
  *
  * @Author: Yiming
- * @Date: 2023/03/24/20:57
+ * @Date: 2023/03/24/15:27
  * @Description:
  */
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@XStreamConverter(value = ParameterConverter.class)
-public class Parameter {
-    private String name;
+@XStreamConverter(DatagramMessageConverter.class)
+public class DatagramMessage {
+    private String address;
+    private String port;
+    private String time;
     private String value;
 }

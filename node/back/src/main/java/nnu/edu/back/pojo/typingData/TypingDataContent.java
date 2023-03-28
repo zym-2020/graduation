@@ -1,4 +1,4 @@
-package nnu.edu.back.proj.config;
+package nnu.edu.back.pojo.typingData;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -12,16 +12,16 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  *
  * @Author: Yiming
- * @Date: 2023/03/25/21:02
+ * @Date: 2023/03/25/21:19
  * @Description:
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Typing {
+@AllArgsConstructor
+public class TypingDataContent {
     @XStreamAsAttribute
-    String type;
+    String time;
 
     @XStreamImplicit(itemFieldName = "key")
-    List<String> keys;
+    List<TypingKey> keys;
 }

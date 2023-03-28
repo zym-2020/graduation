@@ -5,7 +5,7 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import nnu.edu.back.proj.config.Parameter;
+import nnu.edu.back.pojo.config.Parameter;
 
 /**
  * Created with IntelliJ IDEA.

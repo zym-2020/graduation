@@ -1,13 +1,91 @@
 <template>
-  <div>管理设备</div>
+  <div class="manage-device">
+    <div class="top">
+      <map-chart :deviceList="deviceList" />
+      <chart-card class="c1" />
+    </div>
+    <div class="bottom">
+      <chart-card class="c3" />
+      <chart-card class="c4" />
+      <chart-card class="c5" />
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import {
+  defineComponent,
+  onActivated,
+  onDeactivated,
+  onMounted,
+  ref,
+} from "vue";
+import MapChart from "@/components/manageDevice/MapChart.vue";
+import ChartCard from "@/components/manageDevice/ChartCard.vue";
+import { getAllDevice } from "@/api/request";
+import { DevicePojo } from "@/type";
 export default defineComponent({
-  setup() {},
+  components: { MapChart, ChartCard },
+  setup() {
+    const deviceList = ref<DevicePojo[]>([]);
+
+    const getDeviceList = async () => {
+      const res = await getAllDevice();
+      if (res) {
+        deviceList.value = res.data;
+      }
+    };
+
+    onActivated(() => {
+      getDeviceList();
+    });
+    onDeactivated(() => {
+      console.log(2);
+    });
+
+    return {
+      deviceList,
+    };
+  },
 });
 </script>
 
 <style lang="scss" scoped>
+.manage-device {
+  height: calc(100% - 40px);
+  padding: 20px;
+  .top {
+    height: calc((100% / 3 * 2) - 10px);
+    display: flex;
+    width: 100%;
+    .map-chart {
+      width: calc((100% / 4 * 3) - 10px);
+      height: 100%;
+    }
+    .c1 {
+      width: calc((100% / 4) - 10px);
+      height: 100%;
+      margin-left: 20px;
+    }
+  }
+  .bottom {
+    height: calc((100% / 3) - 10px);
+    margin-top: 20px;
+    display: flex;
+    width: 100%;
+    .c3,
+    .c4,
+    .c5 {
+      height: 100%;
+    }
+    .c3 {
+      width: calc((100% - 40px) / 2);
+    }
+    .c4,
+    .c5 {
+      width: calc((100% - 40px) / 4);
+      margin-left: 20px;
+    }
+  }
+}
 </style>

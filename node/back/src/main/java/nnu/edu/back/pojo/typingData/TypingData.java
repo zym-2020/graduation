@@ -1,4 +1,4 @@
-package nnu.edu.back.proj.typingData;
+package nnu.edu.back.pojo.typingData;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;

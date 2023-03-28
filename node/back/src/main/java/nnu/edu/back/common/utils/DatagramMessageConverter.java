@@ -5,7 +5,7 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import nnu.edu.back.proj.datagram.DatagramMessage;
+import nnu.edu.back.pojo.datagram.DatagramMessage;
 
 /**
  * Created with IntelliJ IDEA.

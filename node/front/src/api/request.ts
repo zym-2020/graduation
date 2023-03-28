@@ -10,6 +10,10 @@ export const initDevice = async (jsonData: Omit<DeviceConfig, "id">) => {
   return post(`/device/initDevice`, true, jsonData);
 };
 
+export const getAllDevice = async () => {
+  return get(`/device/getAllDevice`, true);
+};
+
 //receiveRealTimeData相关接口
 export const checkPort = async (port: number) => {
   return get(`/receiveRealTimeData/checkPort/${port}`, true);

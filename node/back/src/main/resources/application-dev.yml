@@ -1,4 +1,15 @@
 
+spring:
+  datasource:
+    manage:
+      jdbc-url: jdbc:postgresql://localhost:5432/manage?stringtype=unspecified
+      username: postgres
+      password: 123
+      driver-class-name: org.postgresql.Driver
+    monitoring:
+      jdbc-url: D:/zhuomian/毕业/node-manage/monitoring.db
+      driver-class-name: org.sqlite.JDBC
+
 
 # 注意BootNettyChannelInboundHandlerAdapter类中datagramPath 手动修改
 tempPath: D:/zhuomian/毕业/node-manage/temp/
@@ -6,3 +17,4 @@ configPath: D:/zhuomian/毕业/node-manage/config/
 typingDataPath: D:/zhuomian/毕业/node-manage/typingData/
 typingFilePath: D:/zhuomian/毕业/node-manage/typingFile/
 picturePath: D:/zhuomian/毕业/node-manage/picture/
+

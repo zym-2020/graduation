@@ -11,6 +11,9 @@ const routes: Array<RouteRecordRaw> = [
         path: "",
         name: "Home",
         component: () => import("@/views/Home.vue"),
+        meta: {
+          keepAlive: true,
+        },
       },
     ],
   },
@@ -22,6 +25,9 @@ const routes: Array<RouteRecordRaw> = [
         path: "",
         name: "AddDevice",
         component: () => import("@/views/AddDevice.vue"),
+        meta: {
+          keepAlive: true,
+        },
       },
     ],
   },
@@ -33,6 +39,9 @@ const routes: Array<RouteRecordRaw> = [
         path: "",
         name: "RegisterDevice",
         component: () => import("@/views/RegisterDevice.vue"),
+        meta: {
+          keepAlive: false,
+        },
       },
     ],
   },
@@ -44,6 +53,9 @@ const routes: Array<RouteRecordRaw> = [
         path: "",
         name: "SubscribeDevice",
         component: () => import("@/views/SubscribeDevice.vue"),
+        meta: {
+          keepAlive: false,
+        },
       },
     ],
   },
@@ -55,6 +67,9 @@ const routes: Array<RouteRecordRaw> = [
         path: "",
         name: "ManageDevice",
         component: () => import("@/views/ManageDevice.vue"),
+        meta: {
+          keepAlive: true,
+        },
       },
     ],
   },

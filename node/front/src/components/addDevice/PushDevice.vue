@@ -119,6 +119,7 @@ export default defineComponent({
                   const res = await initDevice(jsonData);
                   if (res) {
                     notice("success", "成功", "添加新设备");
+                    availablePort = false
                   }
                 }
               }

@@ -2,7 +2,7 @@ package nnu.edu.back.controller;
 
 import nnu.edu.back.common.result.JsonResult;
 import nnu.edu.back.common.result.ResultUtils;
-import nnu.edu.back.proj.config.DeviceConfig;
+import nnu.edu.back.pojo.config.DeviceConfig;
 import nnu.edu.back.service.DeviceManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,5 +30,10 @@ public class DeviceManageController {
     public JsonResult initDevice(@RequestBody DeviceConfig deviceConfig) {
         deviceManageService.initDevice(deviceConfig);
         return ResultUtils.success();
+    }
+
+    @RequestMapping(value = "/getAllDevice", method = RequestMethod.GET)
+    public JsonResult getAllDevice() {
+        return ResultUtils.success(deviceManageService.getAllDevice());
     }
 }

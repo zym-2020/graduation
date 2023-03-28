@@ -3,11 +3,10 @@ package nnu.edu.back.netty;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import lombok.NoArgsConstructor;
 import nnu.edu.back.common.utils.HandleRealTimeDataUtil;
 import nnu.edu.back.common.utils.XmlUtil;
-import nnu.edu.back.proj.config.DeviceConfig;
-import nnu.edu.back.proj.config.Push;
+import nnu.edu.back.pojo.config.DeviceConfig;
+import nnu.edu.back.pojo.config.Push;
 
 import java.io.File;
 import java.net.InetSocketAddress;

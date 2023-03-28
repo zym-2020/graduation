@@ -1,33 +1,31 @@
-package nnu.edu.back.proj.config;
+package nnu.edu.back.pojo.typingFile;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
  *
  * @Author: Yiming
- * @Date: 2023/03/24/20:47
+ * @Date: 2023/03/26/16:42
  * @Description:
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@XStreamAlias("device")
-public class DeviceConfig {
-    @XStreamAlias("id")
+@AllArgsConstructor
+@XStreamAlias("typingFile")
+public class TypingFile {
     @XStreamAsAttribute
     String id;
+    @XStreamAsAttribute
+    String date;
 
-    @XStreamAlias("attribute")
-    DeviceConfigAttribute deviceConfigAttribute;
-
-    @XStreamAlias("push")
-    Push push;
-
-    @XStreamAlias("typing")
-    Typing typing;
+    @XStreamImplicit(itemFieldName = "map")
+    List<TypingFileMap> maps;
 }

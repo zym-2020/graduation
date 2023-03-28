@@ -1,4 +1,4 @@
-package nnu.edu.back.proj.config;
+package nnu.edu.back.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,13 +8,18 @@ import lombok.NoArgsConstructor;
  * Created with IntelliJ IDEA.
  *
  * @Author: Yiming
- * @Date: 2023/03/24/21:13
+ * @Date: 2023/03/28/11:10
  * @Description:
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Push {
-    String protocol;
-    String port;
+public class Device {
+    String id;
+    String name;
+    String picture;
+    Float longitude;
+    Float latitude;
+    String description;
+    Integer port;
 }

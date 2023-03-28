@@ -1,6 +1,5 @@
-package nnu.edu.back.proj.typingFile;
+package nnu.edu.back.pojo.config;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import lombok.AllArgsConstructor;
@@ -13,19 +12,16 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  *
  * @Author: Yiming
- * @Date: 2023/03/26/16:42
+ * @Date: 2023/03/25/21:02
  * @Description:
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@XStreamAlias("typingFile")
-public class TypingFile {
+@NoArgsConstructor
+public class Typing {
     @XStreamAsAttribute
-    String id;
-    @XStreamAsAttribute
-    String date;
+    String type;
 
-    @XStreamImplicit(itemFieldName = "map")
-    List<TypingFileMap> maps;
+    @XStreamImplicit(itemFieldName = "key")
+    List<String> keys;
 }

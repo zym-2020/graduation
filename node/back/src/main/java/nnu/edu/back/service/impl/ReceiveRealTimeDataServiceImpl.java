@@ -5,16 +5,19 @@ import nnu.edu.back.common.exception.MyException;
 import nnu.edu.back.common.result.ResultEnum;
 import nnu.edu.back.common.utils.FileUtil;
 import nnu.edu.back.common.utils.XmlUtil;
+import nnu.edu.back.dao.manage.DeviceMapper;
 import nnu.edu.back.netty.TCPServer;
 import nnu.edu.back.netty.UDPServer;
-import nnu.edu.back.proj.config.DeviceConfig;
-import nnu.edu.back.proj.config.Typing;
-import nnu.edu.back.proj.typingData.TypingDataContent;
-import nnu.edu.back.proj.typingData.TypingData;
-import nnu.edu.back.proj.typingData.TypingKey;
-import nnu.edu.back.proj.typingFile.TypingFile;
-import nnu.edu.back.proj.typingFile.TypingFileMap;
+import nnu.edu.back.pojo.Device;
+import nnu.edu.back.pojo.config.DeviceConfig;
+import nnu.edu.back.pojo.config.Typing;
+import nnu.edu.back.pojo.typingData.TypingDataContent;
+import nnu.edu.back.pojo.typingData.TypingData;
+import nnu.edu.back.pojo.typingData.TypingKey;
+import nnu.edu.back.pojo.typingFile.TypingFile;
+import nnu.edu.back.pojo.typingFile.TypingFileMap;
 import nnu.edu.back.service.ReceiveRealTimeDataService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -49,6 +52,9 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
 
     @Value("${typingFilePath}")
     String typingFilePath;
+
+    @Autowired
+    DeviceMapper deviceMapper;
 
     @Override
     @Async("asyncServiceExecutor")
@@ -195,6 +201,10 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
 
     @Override
     public int checkPort(int port) {
+        Device device = deviceMapper.queryByPort(port);
+        if (device != null) {
+            return -1;
+        }
         String host = "localhost";
         try {
             Socket socket = new Socket(host, port);

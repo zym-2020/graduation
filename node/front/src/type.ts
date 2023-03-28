@@ -37,3 +37,13 @@ export interface DeviceConfig {
     keys: string[];
   };
 }
+
+export interface DevicePojo {
+  id: string;
+  name: string | null;
+  picture: string | null;
+  longitude: number;
+  latitude: number;
+  description: string | null;
+  port: number | null;
+}

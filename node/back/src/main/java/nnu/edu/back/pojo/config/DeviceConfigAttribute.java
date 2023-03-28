@@ -1,14 +1,8 @@
-package nnu.edu.back.proj.config;
+package nnu.edu.back.pojo.config;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,8 +20,9 @@ public class DeviceConfigAttribute {
     private String model;
     private ProductParameters productParameters;
     private String description;
-    private Double longitude;
-    private Double latitude;
+    private Float longitude;
+    private Float latitude;
     private String watercourse;
     private String department;
+    private String picture;
 }

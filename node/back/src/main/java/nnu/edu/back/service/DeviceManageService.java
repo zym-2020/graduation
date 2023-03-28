@@ -1,7 +1,10 @@
 package nnu.edu.back.service;
 
-import nnu.edu.back.proj.config.DeviceConfig;
+import nnu.edu.back.pojo.Device;
+import nnu.edu.back.pojo.config.DeviceConfig;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,4 +17,6 @@ public interface DeviceManageService {
     String uploadDevicePicture(MultipartFile file);
 
     void initDevice(DeviceConfig deviceConfig);
+
+    List<Device> getAllDevice();
 }

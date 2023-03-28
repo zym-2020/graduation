@@ -1,4 +1,4 @@
-package nnu.edu.back.proj.datagram;
+package nnu.edu.back.pojo.datagram;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;

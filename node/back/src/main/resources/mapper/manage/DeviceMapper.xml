@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nnu.edu.back.dao.manage.DeviceMapper">
+    <resultMap id="deviceMap" type="nnu.edu.back.pojo.Device">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="picture" property="picture"></result>
+        <result column="longitude" property="longitude"></result>
+        <result column="latitude" property="latitude"></result>
+        <result column="description" property="description"></result>
+        <result column="port" property="port"></result>
+    </resultMap>
+
+    <select id="queryByPort" resultMap="deviceMap">
+        select * from device where port = #{port}
+    </select>
+
+    <insert id="insertDevice">
+        insert into device values(#{device.id}, #{device.name}, #{device.picture}, #{device.longitude}, #{device.latitude}, #{device.description}, #{device.port})
+    </insert>
+
+    <select id="getAllDevice" resultMap="deviceMap">
+        select * from device
+    </select>
+</mapper>

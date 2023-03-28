@@ -1,11 +1,10 @@
 package nnu.edu.back.common.utils;
 
 import com.thoughtworks.xstream.XStream;
-import nnu.edu.back.common.exception.MyException;
-import nnu.edu.back.proj.config.DeviceConfig;
-import nnu.edu.back.proj.datagram.Datagram;
-import nnu.edu.back.proj.typingData.TypingData;
-import nnu.edu.back.proj.typingFile.TypingFile;
+import nnu.edu.back.pojo.config.DeviceConfig;
+import nnu.edu.back.pojo.datagram.Datagram;
+import nnu.edu.back.pojo.typingData.TypingData;
+import nnu.edu.back.pojo.typingFile.TypingFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
