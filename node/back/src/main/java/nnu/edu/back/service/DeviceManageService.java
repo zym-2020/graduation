@@ -4,6 +4,7 @@ import nnu.edu.back.pojo.Device;
 import nnu.edu.back.pojo.config.DeviceConfig;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -19,4 +20,6 @@ public interface DeviceManageService {
     void initDevice(DeviceConfig deviceConfig);
 
     List<Device> getAllDevice();
+
+    void getPicture(String pictureName, HttpServletResponse response);
 }

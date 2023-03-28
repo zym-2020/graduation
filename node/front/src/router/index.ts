@@ -71,6 +71,14 @@ const routes: Array<RouteRecordRaw> = [
           keepAlive: true,
         },
       },
+      {
+        path: ":id",
+        name: "DeviceDetail",
+        component: () => import("@/views/DeviceDetail.vue"),
+        meta: {
+          keepAlive: false,
+        },
+      },
     ],
   },
 ];

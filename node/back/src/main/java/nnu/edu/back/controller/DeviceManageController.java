@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -35,5 +37,11 @@ public class DeviceManageController {
     @RequestMapping(value = "/getAllDevice", method = RequestMethod.GET)
     public JsonResult getAllDevice() {
         return ResultUtils.success(deviceManageService.getAllDevice());
+    }
+
+    @CrossOrigin
+    @RequestMapping(value = "/getPicture/{pictureName}", method = RequestMethod.GET)
+    public void getPicture(@PathVariable String pictureName, HttpServletResponse response) {
+        deviceManageService.getPicture(pictureName, response);
     }
 }

@@ -25,6 +25,10 @@ export interface DeviceAttributeInstance {
   }>;
 }
 
+export interface MapChartInstance {
+  focusLocation: (param: [number, number]) => {};
+}
+
 export interface DeviceConfig {
   id: string;
   deviceConfigAttribute: DeviceAttribute;
@@ -46,4 +50,6 @@ export interface DevicePojo {
   latitude: number;
   description: string | null;
   port: number | null;
+  state: number;
+  lastUpdate: string | null;
 }

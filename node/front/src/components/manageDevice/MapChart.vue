@@ -64,15 +64,19 @@ export default defineComponent({
     const watchUtil = (newVal: DevicePojo[], oldVal: DevicePojo[]) => {
       const tempNew = [...newVal];
       const tempOld = [...oldVal];
-      tempNew.forEach((item, index) => {
+      let count = 0;
+      while (count < tempNew.length) {
         for (let i = 0; i < tempOld.length; i++) {
-          if (item.id === tempOld[i].id) {
+          if (tempNew[count].id === tempOld[i].id) {
             tempOld.splice(i, 1);
-            tempNew.splice(index, 1);
+            tempNew.splice(count, 1);
+            count--;
             break;
           }
         }
-      });
+        count++;
+      }
+
       tempNew.forEach((item) => {
         if (!map.getLayer(item.id)) {
           map.addSource(item.id, {
@@ -117,12 +121,15 @@ export default defineComponent({
       }
     );
 
+    const focusLocation = (param: [number, number]) => {
+      map.setCenter(param);
+    };
+
     onMounted(() => {
-      console.log(1);
       initMap();
     });
 
-    return { container };
+    return { container, focusLocation };
   },
 });
 </script>

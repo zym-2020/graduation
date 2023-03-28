@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -22,4 +24,6 @@ public class Device {
     Float latitude;
     String description;
     Integer port;
+    Integer state;
+    Date lastUpdate;
 }

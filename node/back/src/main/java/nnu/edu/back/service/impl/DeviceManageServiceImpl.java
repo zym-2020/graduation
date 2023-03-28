@@ -15,6 +15,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,11 +62,33 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         }
         DeviceConfigAttribute attribute = deviceConfig.getDeviceConfigAttribute();
         Push push = deviceConfig.getPush();
-        deviceMapper.insertDevice(new Device(uuid, attribute.getName(), attribute.getPicture(), attribute.getLongitude(), attribute.getLatitude(), attribute.getDescription(), push == null ? null : Integer.valueOf(push.getPort())));
+        deviceMapper.insertDevice(new Device(uuid, attribute.getName(), attribute.getPicture(), attribute.getLongitude(), attribute.getLatitude(), attribute.getDescription(), push == null ? null : Integer.valueOf(push.getPort()), -1, null));
     }
 
     @Override
     public List<Device> getAllDevice() {
         return deviceMapper.getAllDevice();
+    }
+
+    @Override
+    public void getPicture(String pictureName, HttpServletResponse response) {
+        File file = new File(picturePath + pictureName);
+        if (!file.exists()) {
+            throw new MyException(ResultEnum.NO_OBJECT);
+        }
+        try {
+            InputStream inputStream = new FileInputStream(file);
+            ServletOutputStream outputStream = response.getOutputStream();
+            byte[] bytes = new byte[1024];
+            int len;
+            while ((len = inputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, len);
+            }
+            outputStream.flush();
+            outputStream.close();
+            inputStream.close();
+        } catch (Exception e) {
+            throw new MyException(ResultEnum.FILE_READ_OR_WRITE_ERROR);
+        }
     }
 }

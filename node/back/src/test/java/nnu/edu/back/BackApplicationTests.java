@@ -16,7 +16,7 @@ class BackApplicationTests {
 
     @Test
     void contextLoads() {
-        deviceMapper.insertDevice(new Device("ec3555c3-60cf-c233-9340-f00d19c77b9d", null, null, null, null, null, null));
+
     }
 
 }
