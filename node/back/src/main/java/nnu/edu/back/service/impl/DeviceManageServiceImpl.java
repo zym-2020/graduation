@@ -1,5 +1,6 @@
 package nnu.edu.back.service.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import nnu.edu.back.common.exception.MyException;
 import nnu.edu.back.common.result.ResultEnum;
 import nnu.edu.back.common.utils.FileUtil;
@@ -20,8 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,6 +37,15 @@ public class DeviceManageServiceImpl implements DeviceManageService {
 
     @Value("${configPath}")
     String configPath;
+
+    @Value("${datagramPath}")
+    String datagramPath;
+
+    @Value("${typingDataPath}")
+    String typingDataPath;
+
+    @Value("${typingFilePath}")
+    String typingFilePath;
 
     @Autowired
     DeviceMapper deviceMapper;
@@ -90,5 +99,45 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         } catch (Exception e) {
             throw new MyException(ResultEnum.FILE_READ_OR_WRITE_ERROR);
         }
+    }
+
+    @Override
+    public Map<String, Object> getDeviceData(String deviceId) {
+        Map<String, Object> result = new HashMap<>();
+        Device device = deviceMapper.queryDeviceById(deviceId);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("state", device.getState());
+        jsonObject.put("lastUpdate", device.getLastUpdate());
+        result.put("status", jsonObject);
+        File file = new File(configPath + deviceId + ".xml");
+        if (!file.exists()) {
+            throw new MyException(ResultEnum.NO_OBJECT);
+        }
+        DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
+        result.put("device", deviceConfig);
+        File f = null;
+        if (deviceConfig.getPush() != null) {
+            f = new File(datagramPath + deviceId);
+        }
+        if (deviceConfig.getTyping() != null) {
+            if (deviceConfig.getTyping().getType().equals("input")) {
+                f = new File(typingDataPath + deviceId);
+            } else {
+                f = new File(typingFilePath + deviceId);
+            }
+        }
+        if (f == null || !f.exists()) {
+            result.put("data", new ArrayList<>());
+            return result;
+        }
+        String[] files = f.list();
+        List<String> list = new ArrayList<>();
+        for (String fileName : files) {
+            if (!fileName.equals("file")) {
+                list.add(fileName.substring(0, fileName.lastIndexOf(".")));
+            }
+        }
+        result.put("data", list);
+        return result;
     }
 }

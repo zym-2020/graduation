@@ -6,6 +6,7 @@ import ElementPlus from 'element-plus'
 import * as Icons from '@element-plus/icons'
 import 'element-plus/dist/index.css'
 import locale from 'element-plus/lib/locale/lang/zh-cn'
+import '@/permission'
 
 const app = createApp(App)
 app.use(ElementPlus, { locale })

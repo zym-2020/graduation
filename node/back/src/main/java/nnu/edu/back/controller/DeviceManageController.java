@@ -44,4 +44,9 @@ public class DeviceManageController {
     public void getPicture(@PathVariable String pictureName, HttpServletResponse response) {
         deviceManageService.getPicture(pictureName, response);
     }
+
+    @RequestMapping(value = "/getDeviceData/{deviceId}", method = RequestMethod.GET)
+    public JsonResult getDeviceData(@PathVariable String deviceId) {
+        return ResultUtils.success(deviceManageService.getDeviceData(deviceId));
+    }
 }

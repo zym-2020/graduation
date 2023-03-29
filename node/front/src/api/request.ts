@@ -14,7 +14,19 @@ export const getAllDevice = async () => {
   return get(`/device/getAllDevice`, true);
 };
 
+export const getDeviceData = async (deviceId: string) => {
+  return get(`/device/getDeviceData/${deviceId}`, true);
+};
+
 //receiveRealTimeData相关接口
 export const checkPort = async (port: number) => {
   return get(`/receiveRealTimeData/checkPort/${port}`, true);
+};
+
+export const startTCPServer = async (port: number, deviceId: string) => {
+  return post(`/receiveRealTimeData/startTCPServer/${port}/${deviceId}`, true);
+};
+
+export const stopTCPServer = async (port: number, deviceId: string) => {
+  return post(`/receiveRealTimeData/stopTCPServer/${port}/${deviceId}`, true);
 };

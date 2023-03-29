@@ -24,4 +24,12 @@
     <select id="getAllDevice" resultMap="deviceMap">
         select * from device
     </select>
+
+    <select id="queryDeviceById" resultMap="deviceMap">
+        select * from device where id::text = #{id}
+    </select>
+
+    <update id="updateState">
+        update device set state = #{state} where id::text = #{id}
+    </update>
 </mapper>

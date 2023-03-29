@@ -61,19 +61,23 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
     public void startTCPServer(int port, String deviceId) throws InterruptedException {
         TCPServer tcpServer = new TCPServer(configPath + deviceId + ".xml");
         cache.put(port, tcpServer);
+        deviceMapper.updateState(deviceId, 1);
         /**
          * 启动该方法会阻塞当前线程
          */
         tcpServer.bind(port);
+
     }
 
     @Override
-    public void stopTCPServer(int port) {
+    public void stopTCPServer(int port, String deviceId) {
         TCPServer tcpServer = cache.get(port);
+
         if (tcpServer != null) {
             tcpServer.stop();
             cache.remove(port);
         }
+        deviceMapper.updateState(deviceId, -1);
     }
 
     @Async("asyncServiceExecutor")

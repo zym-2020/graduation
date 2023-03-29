@@ -16,9 +16,9 @@
           <el-select v-model="form.protocol">
             <el-option
               v-for="item in options"
-              :key="item"
-              :label="item"
-              :value="item"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
             />
           </el-select>
         </el-form-item>
@@ -55,7 +55,10 @@ export default defineComponent({
   },
   emits: ["checkAttribute"],
   setup(props, context) {
-    const options = ["TCP协议", "UDP协议"];
+    const options = [
+      { label: "TCP协议", value: "TCP" },
+      { label: "UDP协议", value: "UDP" },
+    ];
     const form = ref({
       protocol: "",
       port: "",
@@ -119,7 +122,7 @@ export default defineComponent({
                   const res = await initDevice(jsonData);
                   if (res) {
                     notice("success", "成功", "添加新设备");
-                    availablePort = false
+                    availablePort = false;
                   }
                 }
               }

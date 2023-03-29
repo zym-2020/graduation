@@ -66,6 +66,8 @@ export default defineComponent({
             return "4";
           case "ManageDevice":
             return "5";
+          case "DeviceDetail":
+            return "5";
           default:
             return "1";
         }

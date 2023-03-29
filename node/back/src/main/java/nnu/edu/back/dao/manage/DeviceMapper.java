@@ -20,4 +20,8 @@ public interface DeviceMapper {
     void insertDevice(@Param("device") Device device);
 
     List<Device> getAllDevice();
+
+    Device queryDeviceById(@Param("id") String deviceId);
+
+    void updateState(@Param("id") String deviceId, @Param("state") int state);
 }

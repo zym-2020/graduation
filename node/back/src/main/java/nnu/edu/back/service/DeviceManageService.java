@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,4 +23,6 @@ public interface DeviceManageService {
     List<Device> getAllDevice();
 
     void getPicture(String pictureName, HttpServletResponse response);
+
+    Map<String, Object> getDeviceData(String deviceId);
 }

@@ -28,9 +28,9 @@ public class ReceiveRealTimeDataController {
         return ResultUtils.success();
     }
 
-    @RequestMapping(value = "/stopTCPServer/{port}", method = RequestMethod.POST)
-    public JsonResult stopTCPServer(@PathVariable int port) {
-        receiveRealTimeDataService.stopTCPServer(port);
+    @RequestMapping(value = "/stopTCPServer/{port}/{deviceId}", method = RequestMethod.POST)
+    public JsonResult stopTCPServer(@PathVariable int port, @PathVariable String deviceId) {
+        receiveRealTimeDataService.stopTCPServer(port, deviceId);
         return ResultUtils.success();
     }
 

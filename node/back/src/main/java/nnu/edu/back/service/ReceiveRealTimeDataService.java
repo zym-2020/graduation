@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface ReceiveRealTimeDataService {
     void startTCPServer(int port, String deviceId) throws InterruptedException;
 
-    void stopTCPServer(int port);
+    void stopTCPServer(int port, String deviceId);
 
     void startUDPServer(int port);
 

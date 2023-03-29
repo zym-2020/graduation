@@ -81,6 +81,19 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: "/404",
+    name: "404",
+    component: () => import("@/views/404.vue"),
+    meta: {
+      title: "404",
+    },
+  },
+  {
+    path: "/:catchAll(.*)",
+    name: "Redirect404",
+    redirect: "/404",
+  },
 ];
 
 const router = createRouter({
