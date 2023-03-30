@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: broker
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+server:
+  port: 8900
+
+
+thread-pool:
+  core_pool_size: 5
+  max_pool_size: 5
+  queue_capacity: 99999
+  prefix: t-pool-
