@@ -1,5 +1,6 @@
 package nnu.edu.back.common.utils;
 
+import nnu.edu.back.pojo.Device;
 import nnu.edu.back.pojo.datagram.Datagram;
 import nnu.edu.back.pojo.datagram.DatagramMessage;
 
@@ -26,7 +27,7 @@ public class HandleRealTimeDataUtil {
         File file = new File(fileName);
         if (!file.exists()) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
             List<DatagramMessage> messages = new ArrayList<>();
             messages.add(new DatagramMessage(address, port, timeFormat.format(new Date()), data));
             Datagram datagram = new Datagram(id, type, listen, dateFormat.format(new Date()), messages);
@@ -40,7 +41,7 @@ public class HandleRealTimeDataUtil {
         } else {
             try {
                 Datagram datagram = XmlUtil.fromXml(file, Datagram.class);
-                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
                 datagram.getMessages().add(new DatagramMessage(address, port, timeFormat.format(new Date()), data));
                 String content = XmlUtil.toXml(datagram);
                 FileUtil.writeFile(fileName, content);

@@ -1,12 +1,17 @@
 package nnu.edu.back.netty;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import nnu.edu.back.common.aspect.PushNotice;
 import nnu.edu.back.common.utils.HandleRealTimeDataUtil;
 import nnu.edu.back.common.utils.XmlUtil;
+import nnu.edu.back.dao.manage.DeviceMapper;
 import nnu.edu.back.pojo.config.DeviceConfig;
 import nnu.edu.back.pojo.config.Push;
+import nnu.edu.back.service.SSEService;
 
 import java.io.File;
 import java.net.InetSocketAddress;
@@ -24,10 +29,14 @@ import java.util.Date;
 public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandlerAdapter {
 
     private String config;
+    private SSEService sseService;
+    private DeviceMapper deviceMapper;
     private static String datagramPath = "D:/zhuomian/毕业/node-manage/datagram/";
 
-    public BootNettyChannelInboundHandlerAdapter(String config) {
+    public BootNettyChannelInboundHandlerAdapter(String config, SSEService sseService, DeviceMapper deviceMapper) {
         this.config = config;
+        this.sseService = sseService;
+        this.deviceMapper = deviceMapper;
     }
 
     private void handleMethod(String data, String clientAddress, String clientPort) throws Exception {
@@ -39,7 +48,15 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
         if (deviceConfig.getPush() != null) {
             Push push = deviceConfig.getPush();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             HandleRealTimeDataUtil.normalHandle(datagramPath + deviceConfig.getId() + "/" + dateFormat.format(new Date()) + ".xml", deviceConfig.getId(), push.getPort(), push.getProtocol(), clientAddress, clientPort, data);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("id", deviceConfig.getId());
+            jsonObject.put("time", format.format(new Date()));
+            jsonObject.put("name", deviceConfig.getDeviceConfigAttribute().getName());
+            sseService.broadcastAll(JSON.toJSONString(jsonObject));
+            sseService.message("detail", deviceConfig.getId(), dateFormat.format(new Date()));
+            deviceMapper.updateLastUpdate(deviceConfig.getId());
         }
     }
 
@@ -96,7 +113,7 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
-        System.out.println(cause);
+
     }
 
     /**

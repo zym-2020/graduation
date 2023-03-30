@@ -20,11 +20,13 @@ import { defineComponent, onActivated, onDeactivated, ref } from "vue";
 import MapChart from "@/components/manageDevice/MapChart.vue";
 import ChartCard from "@/components/manageDevice/ChartCard.vue";
 import DeviceListCard from "@/components/manageDevice/DeviceListCard.vue";
-import { getAllDevice } from "@/api/request";
+import { getAllDevice, overSSE } from "@/api/request";
 import { DevicePojo, MapChartInstance } from "@/type";
+import { notice } from "@/utils/common";
 export default defineComponent({
   components: { MapChart, ChartCard, DeviceListCard },
   setup() {
+    let id: string;
     const deviceList = ref<DevicePojo[]>([]);
 
     const mapChart = ref<MapChartInstance>();
@@ -36,15 +38,52 @@ export default defineComponent({
       }
     };
 
+    const sseInit = () => {
+      id = new Date().getTime().toString();
+      const source = new EventSource(`/nodeManage/SSE/subscribe/all/${id}`);
+
+      source.addEventListener("msg", (event) => {
+        console.log(event);
+        const data = JSON.parse((event as MessageEvent).data);
+        notice("success", "数据更新", `${data.name}更新！`);
+        for (let i = 0; i < deviceList.value.length; i++) {
+          if (deviceList.value[i].id === data.id) {
+            deviceList.value[i].lastUpdate = data.time;
+          }
+        }
+      });
+
+      source.addEventListener("start", (e) => {
+        console.log("start", e);
+      });
+
+      source.addEventListener("stop", (e) => {
+        console.log("stop", e);
+        source.close();
+      });
+
+      source.onerror = (e) => {
+        console.log(e);
+      };
+    };
+
+    const sseClose = async () => {
+      await overSSE("all", id);
+    };
+
     const focusDeviceLocation = (val: [number, number]) => {
       mapChart.value!.focusLocation(val);
     };
 
-    onActivated(() => {
-      getDeviceList();
+    onActivated(async () => {
+      window.addEventListener("beforeunload", async () => {
+        await sseClose();
+      });
+      await getDeviceList();
+      sseInit();
     });
     onDeactivated(() => {
-      console.log(2);
+      sseClose();
     });
 
     return {

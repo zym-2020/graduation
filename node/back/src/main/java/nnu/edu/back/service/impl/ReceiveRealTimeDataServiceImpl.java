@@ -17,6 +17,7 @@ import nnu.edu.back.pojo.typingData.TypingKey;
 import nnu.edu.back.pojo.typingFile.TypingFile;
 import nnu.edu.back.pojo.typingFile.TypingFileMap;
 import nnu.edu.back.service.ReceiveRealTimeDataService;
+import nnu.edu.back.service.SSEService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -56,10 +57,13 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
     @Autowired
     DeviceMapper deviceMapper;
 
+    @Autowired
+    SSEService sseService;
+
     @Override
     @Async("asyncServiceExecutor")
     public void startTCPServer(int port, String deviceId) throws InterruptedException {
-        TCPServer tcpServer = new TCPServer(configPath + deviceId + ".xml");
+        TCPServer tcpServer = new TCPServer(configPath + deviceId + ".xml", sseService, deviceMapper);
         cache.put(port, tcpServer);
         deviceMapper.updateState(deviceId, 1);
         /**
@@ -110,7 +114,7 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
             throw new MyException(ResultEnum.CONFIG_ERROR);
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
         List<TypingDataContent> typingDataContents = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
             TypingDataContent typingDataContent = new TypingDataContent();
@@ -170,7 +174,7 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
                 throw new MyException(ResultEnum.FILE_READ_OR_WRITE_ERROR);
             }
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
             TypingFileMap typingFileMap = new TypingFileMap();
             typingFileMap.setTime(timeFormat.format(new Date()));
             typingFileMap.setName(fileName);
@@ -216,6 +220,21 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
             return -1;
         } catch (Exception e) {
             return 0;
+        }
+    }
+
+    @Override
+    public void initAllDevice() throws InterruptedException {
+        List<Device> devices = deviceMapper.getAllDevice();
+        for (Device device : devices) {
+            if (device.getPort() != null && device.getState() == 1) {
+                DeviceConfig deviceConfig = XmlUtil.fromXml(new File(configPath + device.getId() + ".xml"), DeviceConfig.class);
+                if (deviceConfig.getPush().getProtocol().equals("TCP")) {
+                    startTCPServer(device.getPort(), device.getId());
+                } else if (deviceConfig.getPush().getProtocol().equals("UDP")) {
+                    startUDPServer(device.getPort());
+                }
+            }
         }
     }
 }

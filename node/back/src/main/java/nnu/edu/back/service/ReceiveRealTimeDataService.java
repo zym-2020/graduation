@@ -27,4 +27,6 @@ public interface ReceiveRealTimeDataService {
     void typingFileMerge(String tempId, String deviceId, int count, String fileName);
 
     int checkPort(int port);
+
+    void initAllDevice() throws InterruptedException;
 }

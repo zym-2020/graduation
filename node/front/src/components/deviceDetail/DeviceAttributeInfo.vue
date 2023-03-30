@@ -64,7 +64,9 @@
               @click="openClick"
               >开启设备</el-button
             >
-            <el-button type="danger" v-else>关闭设备</el-button>
+            <el-button type="danger" v-else @click="closeClick"
+              >关闭设备</el-button
+            >
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -77,7 +79,7 @@ import { computed, defineComponent, PropType, ref } from "vue";
 import { DeviceConfig } from "@/type";
 import { imgBase64, notice } from "@/utils/common";
 import { prefix } from "@/prefix";
-import { startTCPServer } from "@/api/request";
+import { startTCPServer, stopTCPServer } from "@/api/request";
 export default defineComponent({
   props: {
     deviceConfig: {
@@ -169,6 +171,20 @@ export default defineComponent({
       }
     };
 
+    const closeClick = async () => {
+      if (props.deviceConfig?.push) {
+        if (props.deviceConfig.push.protocol === "TCP") {
+          const res = await stopTCPServer(
+            props.deviceConfig.push.port,
+            props.deviceConfig.id
+          );
+          if (res) {
+            notice("success", "成功", "关闭监听");
+          }
+        }
+      }
+    };
+
     return {
       imageUrl,
       attribute,
@@ -179,6 +195,7 @@ export default defineComponent({
       textHandle,
       parameters,
       openClick,
+      closeClick,
     };
   },
 });

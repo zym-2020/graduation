@@ -30,3 +30,8 @@ export const startTCPServer = async (port: number, deviceId: string) => {
 export const stopTCPServer = async (port: number, deviceId: string) => {
   return post(`/receiveRealTimeData/stopTCPServer/${port}/${deviceId}`, true);
 };
+
+//SSE接口
+export const overSSE = async (type: string, id: string) => {
+  return get(`/SSE/over/${type}/${id}`, true);
+};

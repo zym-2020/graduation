@@ -8,6 +8,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import nnu.edu.back.dao.manage.DeviceMapper;
+import nnu.edu.back.service.SSEService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +26,13 @@ public class TCPServer {
 
     private Channel currentChannel;
     private String config;
+    private SSEService sseService;
+    private DeviceMapper deviceMapper;
 
-    public TCPServer(String config) {
+    public TCPServer(String config, SSEService sseService, DeviceMapper deviceMapper) {
         this.config = config;
+        this.sseService = sseService;
+        this.deviceMapper = deviceMapper;
     }
 
     public void bind(int port) throws InterruptedException {
@@ -39,7 +45,7 @@ public class TCPServer {
             serverBootstrap = serverBootstrap.option(ChannelOption.SO_BACKLOG, 64);
             serverBootstrap = serverBootstrap.childOption(ChannelOption.TCP_NODELAY, true);
             serverBootstrap = serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
-            serverBootstrap = serverBootstrap.childHandler(new BootNettyChannelInitializer<SocketChannel>(this.config));
+            serverBootstrap = serverBootstrap.childHandler(new BootNettyChannelInitializer<SocketChannel>(this.config, this.sseService, this.deviceMapper));
             ChannelFuture f = serverBootstrap.bind(port).sync();
             currentChannel = f.channel();
             if (f.isSuccess()) {

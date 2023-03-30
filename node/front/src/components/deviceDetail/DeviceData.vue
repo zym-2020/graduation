@@ -7,10 +7,14 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, PropType } from "vue";
+import { DeviceConfig } from "@/type";
 export default defineComponent({
   props: {
     dataList: {
       type: Object as PropType<string[]>,
+    },
+    deviceConfig: {
+      type: Object as PropType<DeviceConfig>,
     },
   },
   setup(props) {

@@ -32,4 +32,8 @@
     <update id="updateState">
         update device set state = #{state} where id::text = #{id}
     </update>
+
+    <update id="updateLastUpdate">
+        update device set last_update = now() where id::text = #{id}
+    </update>
 </mapper>

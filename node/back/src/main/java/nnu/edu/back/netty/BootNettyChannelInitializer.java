@@ -6,6 +6,8 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
+import nnu.edu.back.dao.manage.DeviceMapper;
+import nnu.edu.back.service.SSEService;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,9 +25,13 @@ public class BootNettyChannelInitializer<SocketChannel> extends ChannelInitializ
     public static long ALL_TIME_OUT = 60;
 
     private String config;
+    private SSEService sseService;
+    private DeviceMapper deviceMapper;
 
-    public BootNettyChannelInitializer(String config) {
+    public BootNettyChannelInitializer(String config, SSEService sseService, DeviceMapper deviceMapper) {
         this.config = config;
+        this.sseService = sseService;
+        this.deviceMapper = deviceMapper;
     }
 
     @Override
@@ -41,6 +47,6 @@ public class BootNettyChannelInitializer<SocketChannel> extends ChannelInitializ
         channel.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
 
         //自定义ChannelInboundHandlerAdapter
-        channel.pipeline().addLast(new BootNettyChannelInboundHandlerAdapter(this.config));
+        channel.pipeline().addLast(new BootNettyChannelInboundHandlerAdapter(this.config, this.sseService, this.deviceMapper));
     }
 }
