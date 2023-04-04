@@ -13,27 +13,17 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  *
  * @Author: Yiming
- * @Date: 2023/03/24/20:47
+ * @Date: 2023/04/04/16:32
  * @Description:
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@XStreamAlias("device")
-public class DeviceConfig {
-    @XStreamAlias("id")
+@AllArgsConstructor
+
+public class Action {
     @XStreamAsAttribute
     String id;
 
-    @XStreamAlias("attribute")
-    DeviceConfigAttribute deviceConfigAttribute;
-
-    @XStreamAlias("push")
-    Push push;
-
-    @XStreamAlias("typing")
-    Typing typing;
-
-    @XStreamAlias("actions")
-    Actions actions;
+    @XStreamImplicit(itemFieldName = "step")
+    List<ActionStep> steps;
 }

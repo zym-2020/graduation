@@ -5,18 +5,28 @@ import com.alibaba.fastjson2.JSONObject;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import lombok.SneakyThrows;
 import nnu.edu.back.common.aspect.PushNotice;
+import nnu.edu.back.common.exception.MyException;
+import nnu.edu.back.common.result.ResultEnum;
 import nnu.edu.back.common.utils.HandleRealTimeDataUtil;
+import nnu.edu.back.common.utils.ProcessUtil;
+import nnu.edu.back.common.utils.ScriptUtil;
 import nnu.edu.back.common.utils.XmlUtil;
 import nnu.edu.back.dao.manage.DeviceMapper;
+import nnu.edu.back.pojo.config.Action;
+import nnu.edu.back.pojo.config.ActionStep;
 import nnu.edu.back.pojo.config.DeviceConfig;
 import nnu.edu.back.pojo.config.Push;
+import nnu.edu.back.pojo.scriptConfig.Script;
 import nnu.edu.back.service.SSEService;
 
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,6 +42,8 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
     private SSEService sseService;
     private DeviceMapper deviceMapper;
     private static String datagramPath = "D:/zhuomian/毕业/node-manage/datagram/";
+    private static String scriptPath = "D:/zhuomian/毕业/node-manage/scripts/";
+
 
     public BootNettyChannelInboundHandlerAdapter(String config, SSEService sseService, DeviceMapper deviceMapper) {
         this.config = config;
@@ -45,19 +57,56 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
             throw new Exception();
         }
         DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         if (deviceConfig.getPush() != null) {
             Push push = deviceConfig.getPush();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             HandleRealTimeDataUtil.normalHandle(datagramPath + deviceConfig.getId() + "/" + dateFormat.format(new Date()) + ".xml", deviceConfig.getId(), push.getPort(), push.getProtocol(), clientAddress, clientPort, data);
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("id", deviceConfig.getId());
-            jsonObject.put("time", format.format(new Date()));
-            jsonObject.put("name", deviceConfig.getDeviceConfigAttribute().getName());
-            sseService.broadcastAll(JSON.toJSONString(jsonObject));
-            sseService.message("detail", deviceConfig.getId(), dateFormat.format(new Date()));
-            deviceMapper.updateLastUpdate(deviceConfig.getId());
         }
+        if (deviceConfig.getActions() != null && deviceConfig.getActions().getActionList().size() > 0) {
+            List<Action> actions = deviceConfig.getActions().getActionList();
+            for (Action action : actions) {
+                new Thread() {
+                    @Override
+                    @SneakyThrows
+                    public void run() {
+                        List<ActionStep> steps = action.getSteps();
+                        for (ActionStep step : steps) {
+                            String id = step.getScript();
+                            File file = new File(scriptPath + id + "/scriptConfig.xml");
+                            if (!file.exists()) {
+                                throw new Exception();
+                            }
+                            Script script = XmlUtil.fromXml(file, Script.class);
+                            String paramPath = ScriptUtil.actionParamUtil(step, data, deviceConfig.getId());
+                            List<String> command = new ArrayList<>();
+                            command.add("cmd");
+                            command.add("/c");
+                            command.add("d: " + "&&" + " cd " + scriptPath + script.getId() + "/code" + " && " + script.getEnter() + " " + paramPath);
+                            try {
+                                Process process = ProcessUtil.exeProcess(command);
+                                String result = ProcessUtil.readProcessString(process.getInputStream());
+                                int state = process.exitValue();
+                                System.out.println(result);
+                                if (state != 0) {
+                                    System.out.println("出错了");
+                                }
+                            } catch (Exception e) {
+                                System.out.println("出错了");
+                            }
+                        }
+                    }
+                }.start();
+            }
+
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", deviceConfig.getId());
+        jsonObject.put("time", format.format(new Date()));
+        jsonObject.put("name", deviceConfig.getDeviceConfigAttribute().getName());
+        sseService.broadcastAll(JSON.toJSONString(jsonObject));
+        sseService.message("detail", deviceConfig.getId(), dateFormat.format(new Date()));
+        deviceMapper.updateLastUpdate(deviceConfig.getId());
     }
 
     /**

@@ -26,4 +26,5 @@ public class Device {
     Integer port;
     Integer state;
     Date lastUpdate;
+    Boolean register;
 }

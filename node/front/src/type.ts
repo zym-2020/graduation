@@ -52,4 +52,5 @@ export interface DevicePojo {
   port: number | null;
   state: number;
   lastUpdate: string | null;
+  register: boolean
 }

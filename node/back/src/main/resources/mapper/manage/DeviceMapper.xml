@@ -11,6 +11,7 @@
         <result column="port" property="port"></result>
         <result column="state" property="state"></result>
         <result column="last_update" property="lastUpdate"></result>
+        <result column="register" property="register"></result>
     </resultMap>
 
     <select id="queryByPort" resultMap="deviceMap">

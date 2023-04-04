@@ -87,7 +87,14 @@ public class SSEServiceImpl implements SSEService {
     @Override
     public void broadcastAll(String content) throws IOException {
         for (SseEmitter sseEmitter : sseCache.values()) {
-            sseEmitter.send(SseEmitter.event().name("msg").data(content));
+            try {
+                sseEmitter.send(SseEmitter.event().name("msg").data(content));
+            } catch (Exception e) {
+                /**
+                 * 可能会抛出异常，但我不想处理
+                 */
+                System.out.println(sseCache.keySet());
+            }
         }
     }
 }
