@@ -102,6 +102,11 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
     }
 
     @Override
+    public void changeState(String deviceId, int state) {
+        deviceMapper.updateState(deviceId, state);
+    }
+
+    @Override
     public void typingData(String deviceId, JSONArray jsonArray) {
         String path = configPath + deviceId + ".xml";
         File file = new File(path);

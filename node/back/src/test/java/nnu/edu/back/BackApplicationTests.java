@@ -16,7 +16,9 @@ class BackApplicationTests {
 
     @Test
     void contextLoads() {
-
+        File file = new File("D:\\zhuomian\\毕业\\node-manage\\temp");
+        System.out.println(file.lastModified());
+        System.out.println(System.currentTimeMillis());
     }
 
 }

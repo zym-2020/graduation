@@ -7,6 +7,8 @@ import * as Icons from '@element-plus/icons'
 import 'element-plus/dist/index.css'
 import locale from 'element-plus/lib/locale/lang/zh-cn'
 import '@/permission'
+import '@/assets/iconfont/iconfont.css'
+import '@/assets/iconfont/iconfont.js'
 
 const app = createApp(App)
 app.use(ElementPlus, { locale })

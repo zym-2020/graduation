@@ -2,8 +2,8 @@
   <div class="device-detail">
     <el-scrollbar>
       <div class="content">
-        <device-attribute-info :deviceConfig="deviceConfig" :status="status"/>
-        <device-data :deviceConfig="deviceConfig" :dataList="dataList" />
+        <device-attribute-info :deviceConfig="deviceConfig" :status="status" />
+        <device-data :dataList="dataList" />
       </div>
     </el-scrollbar>
   </div>
@@ -14,16 +14,18 @@ import { defineComponent, onMounted, ref } from "vue";
 import DeviceAttributeInfo from "@/components/deviceDetail/DeviceAttributeInfo.vue";
 import DeviceData from "@/components/deviceDetail/DeviceData.vue";
 import router from "@/router";
-import { DeviceConfig } from "@/type";
+import { DeviceConfig, TableDataType } from "@/type";
 export default defineComponent({
   components: { DeviceAttributeInfo, DeviceData },
   setup() {
     const deviceConfig = ref<DeviceConfig>(
       router.currentRoute.value.params.device as unknown as DeviceConfig
     );
-    const dataList = ref<string[]>(
-      router.currentRoute.value.params.data as string[]
+
+    const dataList = ref<TableDataType[]>(
+      router.currentRoute.value.params.dataList as unknown as TableDataType[]
     );
+
     const status = ref<{ state: number; lastUpdate: string }>(
       router.currentRoute.value.params.status as unknown as {
         state: number;
@@ -33,8 +35,8 @@ export default defineComponent({
 
     return {
       deviceConfig,
+      status,
       dataList,
-      status
     };
   },
 });

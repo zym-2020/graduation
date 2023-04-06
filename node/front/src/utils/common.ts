@@ -62,3 +62,18 @@ export const dateFormat = (date: string, format?: string) => {
       );
   return fmt;
 };
+
+export const formatFileSize = (fileSize: number) => {
+  if (fileSize < 1024) {
+    return fileSize + " B";
+  } else if (fileSize < 1024 * 1024) {
+    let temp = fileSize / 1024;
+    return temp.toFixed(2) + " KB";
+  } else if (fileSize < 1024 * 1024 * 1024) {
+    let temp = fileSize / (1024 * 1024);
+    return temp.toFixed(2) + " MB";
+  } else {
+    let temp = fileSize / (1024 * 1024 * 1024);
+    return temp.toFixed(2) + " GB";
+  }
+};

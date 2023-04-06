@@ -1,13 +1,14 @@
 import { RouteLocationNormalized } from "vue-router";
-import { getDeviceData } from "@/api/request";
+import { getDeviceInfo, getDeviceData } from "@/api/request";
 
 export const toIdPages = async (to: RouteLocationNormalized) => {
   if (to.params.id) {
-    const res = await getDeviceData(to.params.id as string);
-    if (res) {
+    const res = await getDeviceInfo(to.params.id as string);
+    const data = await getDeviceData(to.params.id as string, { path: "/" });
+    if (res && data) {
       to.params.device = res.data.device;
-      to.params.data = res.data.data;
       to.params.status = res.data.status;
+      to.params.dataList = data.data
       return 1;
     } else {
       return -1;

@@ -18,7 +18,7 @@
 @REM ----------------------------------------------------------------------------
 
 @REM ----------------------------------------------------------------------------
-@REM Maven Start Up Batch script
+@REM Maven Start Up Batch scriptConfig
 @REM
 @REM Required ENV vars:
 @REM JAVA_HOME - location of a JDK home dir
@@ -43,9 +43,9 @@ title %0
 @REM set %HOME% to equivalent of $HOME
 if "%HOME%" == "" (set "HOME=%HOMEDRIVE%%HOMEPATH%")
 
-@REM Execute a user defined script before this one
+@REM Execute a user defined scriptConfig before this one
 if not "%MAVEN_SKIP_RC%" == "" goto skipRcPre
-@REM check for pre script, once with legacy .bat ending and once with .cmd ending
+@REM check for pre scriptConfig, once with legacy .bat ending and once with .cmd ending
 if exist "%USERPROFILE%\mavenrc_pre.bat" call "%USERPROFILE%\mavenrc_pre.bat" %*
 if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd" %*
 :skipRcPre
@@ -175,12 +175,12 @@ set ERROR_CODE=1
 @endlocal & set ERROR_CODE=%ERROR_CODE%
 
 if not "%MAVEN_SKIP_RC%"=="" goto skipRcPost
-@REM check for post script, once with legacy .bat ending and once with .cmd ending
+@REM check for post scriptConfig, once with legacy .bat ending and once with .cmd ending
 if exist "%USERPROFILE%\mavenrc_post.bat" call "%USERPROFILE%\mavenrc_post.bat"
 if exist "%USERPROFILE%\mavenrc_post.cmd" call "%USERPROFILE%\mavenrc_post.cmd"
 :skipRcPost
 
-@REM pause the script if MAVEN_BATCH_PAUSE is set to 'on'
+@REM pause the scriptConfig if MAVEN_BATCH_PAUSE is set to 'on'
 if "%MAVEN_BATCH_PAUSE%"=="on" pause
 
 if "%MAVEN_TERMINATE_CMD%"=="on" exit %ERROR_CODE%

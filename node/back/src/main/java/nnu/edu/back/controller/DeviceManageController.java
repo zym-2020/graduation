@@ -1,5 +1,6 @@
 package nnu.edu.back.controller;
 
+import com.alibaba.fastjson2.JSONObject;
 import nnu.edu.back.common.result.JsonResult;
 import nnu.edu.back.common.result.ResultUtils;
 import nnu.edu.back.pojo.config.DeviceConfig;
@@ -45,8 +46,13 @@ public class DeviceManageController {
         deviceManageService.getPicture(pictureName, response);
     }
 
-    @RequestMapping(value = "/getDeviceData/{deviceId}", method = RequestMethod.GET)
-    public JsonResult getDeviceData(@PathVariable String deviceId) {
-        return ResultUtils.success(deviceManageService.getDeviceData(deviceId));
+    @RequestMapping(value = "/getDeviceInfo/{deviceId}", method = RequestMethod.GET)
+    public JsonResult getDeviceInfo(@PathVariable String deviceId) {
+        return ResultUtils.success(deviceManageService.getDeviceInfo(deviceId));
+    }
+
+    @RequestMapping(value = "/getDeviceData/{deviceId}", method = RequestMethod.POST)
+    public JsonResult getDeviceData(@PathVariable String deviceId, @RequestBody JSONObject jsonObject) {
+        return ResultUtils.success(deviceManageService.getDeviceData(deviceId, jsonObject.getString("path")));
     }
 }

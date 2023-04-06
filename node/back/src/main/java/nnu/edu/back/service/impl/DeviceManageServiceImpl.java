@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -38,14 +40,14 @@ public class DeviceManageServiceImpl implements DeviceManageService {
     @Value("${configPath}")
     String configPath;
 
-    @Value("${datagramPath}")
-    String datagramPath;
-
     @Value("${typingDataPath}")
     String typingDataPath;
 
     @Value("${typingFilePath}")
     String typingFilePath;
+
+    @Value("${dataPath}")
+    String dataPath;
 
     @Autowired
     DeviceMapper deviceMapper;
@@ -102,7 +104,7 @@ public class DeviceManageServiceImpl implements DeviceManageService {
     }
 
     @Override
-    public Map<String, Object> getDeviceData(String deviceId) {
+    public Map<String, Object> getDeviceInfo(String deviceId) {
         Map<String, Object> result = new HashMap<>();
         Device device = deviceMapper.queryDeviceById(deviceId);
         JSONObject jsonObject = new JSONObject();
@@ -115,29 +117,35 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         }
         DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
         result.put("device", deviceConfig);
-        File f = null;
-        if (deviceConfig.getPush() != null) {
-            f = new File(datagramPath + deviceId);
+
+        return result;
+    }
+
+    @Override
+    public List<Map<String, Object>> getDeviceData(String deviceId, String path) {
+        String destination;
+        if (path.equals("/")) {
+            destination = dataPath + deviceId;
+        } else {
+            destination = dataPath + deviceId + "/" + path;
         }
-        if (deviceConfig.getTyping() != null) {
-            if (deviceConfig.getTyping().getType().equals("input")) {
-                f = new File(typingDataPath + deviceId);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        File file = new File(destination);
+        List<Map<String, Object>> result = new ArrayList<>();
+        File[] files = file.listFiles();
+        for (File f : files) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", f.getName());
+            map.put("lastUpdate", dateFormat.format(new Date(f.lastModified())));
+            if (f.isFile()) {
+                map.put("type", "file");
+                map.put("size", f.length());
             } else {
-                f = new File(typingFilePath + deviceId);
+                map.put("type", "folder");
             }
+            result.add(map);
         }
-        if (f == null || !f.exists()) {
-            result.put("data", new ArrayList<>());
-            return result;
-        }
-        String[] files = f.list();
-        List<String> list = new ArrayList<>();
-        for (String fileName : files) {
-            if (!fileName.equals("file")) {
-                list.add(fileName.substring(0, fileName.lastIndexOf(".")));
-            }
-        }
-        result.put("data", list);
+
         return result;
     }
 }

@@ -24,5 +24,7 @@ public interface DeviceManageService {
 
     void getPicture(String pictureName, HttpServletResponse response);
 
-    Map<String, Object> getDeviceData(String deviceId);
+    Map<String, Object> getDeviceInfo(String deviceId);
+
+    List<Map<String, Object>> getDeviceData(String deviceId, String path);
 }

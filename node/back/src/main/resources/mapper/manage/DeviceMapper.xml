@@ -23,7 +23,7 @@
     </insert>
 
     <select id="getAllDevice" resultMap="deviceMap">
-        select * from device
+        select * from device order by id
     </select>
 
     <select id="queryDeviceById" resultMap="deviceMap">

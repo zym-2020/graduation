@@ -46,6 +46,12 @@ public class ReceiveRealTimeDataController {
         return ResultUtils.success();
     }
 
+    @RequestMapping(value = "/changeState/{deviceId}/{state}", method = RequestMethod.POST)
+    public JsonResult changeState(@PathVariable String deviceId, @PathVariable int state) {
+        receiveRealTimeDataService.changeState(deviceId, state);
+        return ResultUtils.success();
+    }
+
     @RequestMapping(value = "/typingData/{deviceId}", method = RequestMethod.POST)
     public JsonResult typingData(@PathVariable String deviceId, @RequestBody JSONArray jsonArray) {
         receiveRealTimeDataService.typingData(deviceId, jsonArray);

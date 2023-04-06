@@ -14,8 +14,15 @@ export const getAllDevice = async () => {
   return get(`/device/getAllDevice`, true);
 };
 
-export const getDeviceData = async (deviceId: string) => {
-  return get(`/device/getDeviceData/${deviceId}`, true);
+export const getDeviceInfo = async (deviceId: string) => {
+  return get(`/device/getDeviceInfo/${deviceId}`, true);
+};
+
+export const getDeviceData = async (
+  deviceId: string,
+  jsonDtaa: { path: string }
+) => {
+  return post(`/device/getDeviceData/${deviceId}`, true, jsonDtaa);
 };
 
 //receiveRealTimeData相关接口

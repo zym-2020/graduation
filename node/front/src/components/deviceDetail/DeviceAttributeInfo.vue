@@ -49,13 +49,19 @@
             <strong>设备类型：</strong>
             <el-tag :type="type[1]">{{ type[0] }}</el-tag>
           </div>
-          <div class="port" v-if="type[1] === ''">
-            <strong>监听端口：</strong>
-            {{ port }}
+          <div v-if="type[0] === '主动推送'">
+            <div class="protocol">
+              <strong>传输协议：</strong>
+              {{ protocol }}
+            </div>
+            <div class="port" v-if="type[1] === ''">
+              <strong>监听端口：</strong>
+              {{ port }}
+            </div>
           </div>
           <div class="last-update">
             <strong>上次更新数据：</strong>
-            {{ textHandle(status.lastUpdate) }}
+            {{ dateFormat(textHandle(status.lastUpdate), "yyyy-MM-dd hh:mm") }}
           </div>
           <div class="btn">
             <el-button
@@ -77,7 +83,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from "vue";
 import { DeviceConfig } from "@/type";
-import { imgBase64, notice } from "@/utils/common";
+import { imgBase64, notice, dateFormat } from "@/utils/common";
 import { prefix } from "@/prefix";
 import { startTCPServer, stopTCPServer } from "@/api/request";
 export default defineComponent({
@@ -127,6 +133,10 @@ export default defineComponent({
       } else if (props.deviceConfig?.typing) {
         return ["手动录入", "success"];
       }
+    });
+
+    const protocol = computed(() => {
+      return props.deviceConfig?.push?.protocol;
     });
 
     const port = computed(() => {
@@ -192,10 +202,12 @@ export default defineComponent({
       status,
       type,
       port,
+      protocol,
       textHandle,
       parameters,
       openClick,
       closeClick,
+      dateFormat,
     };
   },
 });
@@ -318,6 +330,7 @@ export default defineComponent({
 
       .type,
       .port,
+      .protocol,
       .last-update {
         margin-top: 10px;
       }

@@ -20,6 +20,8 @@ public interface ReceiveRealTimeDataService {
 
     void stopUDPServer(int port);
 
+    void changeState(String deviceId, int state);
+
     void typingData(String deviceId, JSONArray jsonArray);
 
     void typingFileUpload(String tempId, MultipartFile multipartFile, String fileName);

@@ -9,12 +9,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.List;
 
 @SpringBootApplication
 @ServletComponentScan
 @EnableAsync
+@EnableScheduling
 public class BackApplication implements CommandLineRunner {
 
 

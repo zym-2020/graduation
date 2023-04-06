@@ -17,9 +17,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @XStreamAlias("script")
-public class Script {
+public class ScriptConfig {
     @XStreamAsAttribute
     String id;
+    String name;
     String description;
 
     @XStreamAlias("parameters")

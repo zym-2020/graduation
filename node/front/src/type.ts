@@ -18,6 +18,18 @@ export interface DeviceAttribute {
   };
 }
 
+export interface DeviceActions {
+  actionList: {
+    id: string;
+    steps: {
+      script: string;
+      parameters: {
+        parameterList: string[];
+      };
+    }[];
+  }[];
+}
+
 export interface DeviceAttributeInstance {
   checkForm: () => Promise<{
     attribute: DeviceAttribute;
@@ -40,6 +52,7 @@ export interface DeviceConfig {
     type: string;
     keys: string[];
   };
+  actions?: DeviceActions;
 }
 
 export interface DevicePojo {
@@ -52,5 +65,17 @@ export interface DevicePojo {
   port: number | null;
   state: number;
   lastUpdate: string | null;
-  register: boolean
+  register: boolean;
+}
+
+export interface Tree {
+  label: string;
+  children?: Tree[];
+}
+
+export interface TableDataType {
+  name: string;
+  lastUpdate: string;
+  type: string;
+  size?: number;
 }

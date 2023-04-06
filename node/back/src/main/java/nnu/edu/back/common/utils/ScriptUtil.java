@@ -2,7 +2,7 @@ package nnu.edu.back.common.utils;
 
 import nnu.edu.back.pojo.config.ActionParameters;
 import nnu.edu.back.pojo.config.ActionStep;
-import nnu.edu.back.pojo.scriptConfig.Script;
+import nnu.edu.back.pojo.scriptConfig.ScriptConfig;
 import nnu.edu.back.pojo.scriptConfig.ScriptParameters;
 
 import java.io.File;
@@ -28,8 +28,8 @@ public class ScriptUtil {
         if (!file.exists()) {
             throw new Exception();
         }
-        Script script = XmlUtil.fromXml(file, Script.class);
-        ScriptParameters scriptParameters = script.getParameters();
+        ScriptConfig scriptConfig = XmlUtil.fromXml(file, ScriptConfig.class);
+        ScriptParameters scriptParameters = scriptConfig.getParameters();
         ActionParameters actionParameters = actionStep.getParameters();
         List<String> res = new ArrayList<>();
         for (int i = 0; i < actionParameters.getParameterList().size(); i++) {

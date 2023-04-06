@@ -112,4 +112,20 @@ public class FileUtil {
         }
         return file.delete();
     }
+
+    /**
+    * @Description:处理临时文件
+    * @Author: Yiming
+    * @Date: 2023/4/5
+    */
+    public static void clearTempFile(String tempPath) {
+        File f = new File(tempPath);
+        File[] files = f.listFiles();
+        long nowTime = System.currentTimeMillis();
+        for (File file : files) {
+            if (nowTime - 1000 * 60 * 60 * 24 > file.lastModified()) {
+                deleteFileOrFolder(f);
+            }
+        }
+    }
 }

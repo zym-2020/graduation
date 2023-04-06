@@ -6,9 +6,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.SneakyThrows;
-import nnu.edu.back.common.aspect.PushNotice;
-import nnu.edu.back.common.exception.MyException;
-import nnu.edu.back.common.result.ResultEnum;
 import nnu.edu.back.common.utils.HandleRealTimeDataUtil;
 import nnu.edu.back.common.utils.ProcessUtil;
 import nnu.edu.back.common.utils.ScriptUtil;
@@ -18,7 +15,7 @@ import nnu.edu.back.pojo.config.Action;
 import nnu.edu.back.pojo.config.ActionStep;
 import nnu.edu.back.pojo.config.DeviceConfig;
 import nnu.edu.back.pojo.config.Push;
-import nnu.edu.back.pojo.scriptConfig.Script;
+import nnu.edu.back.pojo.scriptConfig.ScriptConfig;
 import nnu.edu.back.service.SSEService;
 
 import java.io.File;
@@ -41,7 +38,8 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
     private String config;
     private SSEService sseService;
     private DeviceMapper deviceMapper;
-    private static String datagramPath = "D:/zhuomian/毕业/node-manage/datagram/";
+
+    private static String dataPath = "D:/zhuomian/毕业/node-manage/data/";
     private static String scriptPath = "D:/zhuomian/毕业/node-manage/scripts/";
 
 
@@ -61,7 +59,8 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         if (deviceConfig.getPush() != null) {
             Push push = deviceConfig.getPush();
-            HandleRealTimeDataUtil.normalHandle(datagramPath + deviceConfig.getId() + "/" + dateFormat.format(new Date()) + ".xml", deviceConfig.getId(), push.getPort(), push.getProtocol(), clientAddress, clientPort, data);
+            String path = push.getStorage().equals("/") ? dataPath + deviceConfig.getId() + "/" + dateFormat.format(new Date()) + ".xml": dataPath + deviceConfig.getId() + "/" + push.getStorage() + "/" + dateFormat.format(new Date()) + ".xml";
+            HandleRealTimeDataUtil.normalHandle(path, deviceConfig.getId(), push.getPort(), push.getProtocol(), clientAddress, clientPort, data);
         }
         if (deviceConfig.getActions() != null && deviceConfig.getActions().getActionList().size() > 0) {
             List<Action> actions = deviceConfig.getActions().getActionList();
@@ -77,12 +76,12 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
                             if (!file.exists()) {
                                 throw new Exception();
                             }
-                            Script script = XmlUtil.fromXml(file, Script.class);
+                            ScriptConfig scriptConfig = XmlUtil.fromXml(file, ScriptConfig.class);
                             String paramPath = ScriptUtil.actionParamUtil(step, data, deviceConfig.getId());
                             List<String> command = new ArrayList<>();
                             command.add("cmd");
                             command.add("/c");
-                            command.add("d: " + "&&" + " cd " + scriptPath + script.getId() + "/code" + " && " + script.getEnter() + " " + paramPath);
+                            command.add("d: " + "&&" + " cd " + scriptPath + scriptConfig.getId() + "/code" + " && " + scriptConfig.getEnter() + " " + paramPath);
                             try {
                                 Process process = ProcessUtil.exeProcess(command);
                                 String result = ProcessUtil.readProcessString(process.getInputStream());
