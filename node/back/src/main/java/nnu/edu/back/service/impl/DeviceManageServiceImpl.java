@@ -148,4 +148,5 @@ public class DeviceManageServiceImpl implements DeviceManageService {
 
         return result;
     }
+
 }

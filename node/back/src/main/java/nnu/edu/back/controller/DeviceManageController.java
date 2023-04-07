@@ -55,4 +55,5 @@ public class DeviceManageController {
     public JsonResult getDeviceData(@PathVariable String deviceId, @RequestBody JSONObject jsonObject) {
         return ResultUtils.success(deviceManageService.getDeviceData(deviceId, jsonObject.getString("path")));
     }
+
 }

@@ -1,19 +1,38 @@
 <template>
   <div class="device-data">
     <div class="head">
-      <svg fill="currentcolor" viewBox="0 0 256 256">
+      <svg fill="currentcolor" viewBox="0 0 256 256" style="color: #081c42">
         <g>
           <path
             d="M244.1,8.4c-3.9-5.3-10.1-8.5-16.7-8.5H21.6C15,0,8.8,3.1,4.9,8.4C0.8,14-0.9,21,0.3,27.9 c5.1,29.6,15.8,91.9,24.3,141.7v0.1C29,195,32.8,217.1,35,229.9c1.4,10.8,10.4,18.9,21.3,19.3h136.5 c10.9-0.4,19.9-8.5,21.3-19.3l10.3-60.1l0.1-0.4L238.4,88v-0.2l10.3-59.9C249.9,21,248.3,14,244.1,8.4 M206.1,177h-163 l-3.2-18.6h169.3L206.1,177z M220,95.3H28.9l-3.2-18.6h197.4L220,95.3z"
           ></path>
         </g>
       </svg>
+      <div class="title">
+        <div class="title-one">工作空间</div>
+        <div class="title-two">
+          <span class="key">设备：</span>
+          <span class="value">{{
+            deviceConfig.deviceConfigAttribute.name
+          }}</span>
+          &ensp;&ensp;&ensp;
+          <span class="key">类型：</span>
+          <span class="value">{{ type }}</span>
+        </div>
+      </div>
       <div class="btn">
-        <el-button color="#081c42">刷新</el-button>
+        <el-button class="upload" color="white" @click="uploadClick"
+          >上传<el-icon color="#081c42"><Upload /></el-icon
+        ></el-button>
+        <el-button color="#081c42" @click="refresh"
+          >刷新<el-icon color="white"><Refresh /></el-icon
+        ></el-button>
+
+        <div class="upload-menu" v-if="uploadFlag"></div>
       </div>
     </div>
     <div class="path">
-      <div class="left-icon">
+      <div class="left-icon" @click="backClick">
         <el-icon><ArrowLeftBold /></el-icon>
       </div>
       <div class="path-name">
@@ -36,11 +55,22 @@
             ></path>
           </g>
         </svg>
+        <div v-for="(item, index) in path" :key="index">
+          <span class="path-text">{{ item }}</span>
+          <span v-if="index != path.length - 1">&ensp;/&ensp;</span>
+        </div>
       </div>
     </div>
-    <div class="content" ref="tableConponent">
+
+    <div class="content" ref="contentComponent">
       <el-empty description="暂无数据" v-if="dataList.length === 0" />
-      <el-table :data="dataList" :max-height="tableHeight" v-else>
+      <el-table
+        :data="dataList"
+        :max-height="tableHeight"
+        @row-dblclick="rowDblclickHandle"
+        v-loading="loading"
+        v-else
+      >
         <el-table-column label="名称">
           <template #default="scope">
             <svg
@@ -156,24 +186,41 @@ import {
   PropType,
   ref,
 } from "vue";
-import { DeviceConfig } from "@/type";
-import Icon from "./Icon.vue";
-import FileDirectory from "./FileDirectory.vue";
 import { dateFormat, formatFileSize } from "@/utils/common";
 import { TableDataType } from "@/type";
+import { getDeviceData } from "@/api/request";
+import { DeviceConfig } from "@/type";
+import router from "@/router";
 export default defineComponent({
-  components: { Icon, FileDirectory },
   props: {
     dataList: {
       type: Object as PropType<TableDataType[]>,
     },
+    deviceConfig: {
+      type: Object as PropType<DeviceConfig>,
+    },
   },
   setup(props) {
     const tableHeight = ref(0);
-    const tableConponent = ref<HTMLElement>();
+    const contentComponent = ref<HTMLElement>();
+    const path = ref<string[]>([]);
+    const loading = ref(false);
+    const dataList = ref(props.dataList);
+    const uploadFlag = ref(false);
+    const deviceConfig = computed(() => {
+      return props.deviceConfig;
+    });
 
-    const dataList = computed(() => {
-      return props.dataList;
+    const type = computed(() => {
+      if (deviceConfig.value?.push) {
+        return "主动推送";
+      } else if (deviceConfig.value?.typing) {
+        if (deviceConfig.value.typing.type === "input") {
+          return "手动录入（输入）";
+        } else {
+          return "手动录入（文件）";
+        }
+      }
     });
 
     const formatSize = (type: "file" | "folder", size: number) => {
@@ -184,23 +231,130 @@ export default defineComponent({
       }
     };
 
+    const rowDblclickHandle = async (row: TableDataType) => {
+      if (row.type === "folder") {
+        const id = router.currentRoute.value.params.id;
+        loading.value = true;
+        let p = "";
+        path.value.forEach((item) => {
+          p += item + "/";
+        });
+        p += row.name;
+        const res = await getDeviceData(id as string, { path: p });
+        if (res) {
+          dataList.value = res.data;
+          path.value.push(row.name);
+          loading.value = false;
+        }
+      }
+    };
+
+    const backClick = async () => {
+      if (path.value.length > 0) {
+        const id = router.currentRoute.value.params.id;
+        loading.value = true;
+        let p = "";
+        if (path.value.length <= 1) {
+          p = "/";
+        } else {
+          for (let i = 0; i < path.value.length - 1; i++) {
+            p += path.value[i] + "/";
+          }
+          p = p.substring(0, -1);
+        }
+        const res = await getDeviceData(id as string, { path: p });
+        if (res) {
+          dataList.value = res.data;
+          path.value.splice(path.value.length - 1, 1);
+          loading.value = false;
+        }
+      }
+    };
+
+    const refresh = async () => {
+      let p = "";
+      if (path.value.length > 0) {
+        p = path.value[0];
+        for (let i = 1; i < path.value.length; i++) {
+          p += "/" + path.value[i];
+        }
+      } else {
+        p = "/";
+      }
+      const id: string = router.currentRoute.value.params.id as string;
+      loading.value = true;
+      const res = await getDeviceData(id, { path: p });
+      if (res) {
+        dataList.value = res.data;
+        loading.value = false;
+      }
+    };
+
+    const uploadClick = () => {
+      uploadFlag.value = true;
+      console.log(1)
+      function showUpload() {
+        console.log(2)
+        uploadFlag.value = false;
+        window.removeEventListener("click", showUpload);
+      }
+      window.addEventListener("click", showUpload);
+    };
+
     nextTick(() => {
-      tableHeight.value = tableConponent.value!.clientHeight - 40;
+      tableHeight.value = contentComponent.value!.clientHeight - 40;
     });
 
     return {
-      tableConponent,
+      contentComponent,
       tableHeight,
-
+      path,
       dataList,
+      loading,
+      deviceConfig,
+      type,
+      uploadFlag,
       dateFormat,
       formatSize,
+      rowDblclickHandle,
+      backClick,
+      refresh,
+      uploadClick
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
+@-webkit-keyframes scale-up-top {
+  0% {
+    -webkit-transform: scale(0.5);
+    transform: scale(0.5);
+    -webkit-transform-origin: 50% 0%;
+    transform-origin: 50% 0%;
+  }
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-transform-origin: 50% 0%;
+    transform-origin: 50% 0%;
+  }
+}
+@keyframes scale-up-top {
+  0% {
+    -webkit-transform: scale(0.5);
+    transform: scale(0.5);
+    -webkit-transform-origin: 50% 0%;
+    transform-origin: 50% 0%;
+  }
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-transform-origin: 50% 0%;
+    transform-origin: 50% 0%;
+  }
+}
+
 .device-data {
   background: white;
   height: calc(100vh - 40px - 70px);
@@ -210,15 +364,63 @@ export default defineComponent({
     padding: 20px;
     box-sizing: border-box;
     border-bottom: solid 1px #e4e7ed;
+    position: relative;
     svg {
       width: 25px;
-      color: #081c42;
+    }
+
+    .title {
+      position: absolute;
+      top: 20px;
+      left: 60px;
+      font-family: "Helvetica Neue", Helvetica, "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+      .title-one {
+        margin-bottom: 5px;
+        color: #081c42;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .title-two {
+        color: #969fa8;
+        font-size: 12px;
+        .value {
+          font-weight: 700;
+        }
+      }
     }
 
     .btn {
       position: absolute;
       right: 20px;
       top: 20px;
+      .upload {
+        box-sizing: border-box;
+        border: solid 1px #081c42;
+        color: #081c42;
+        &:hover {
+          background: #f5f6f8;
+        }
+      }
+      .el-icon {
+        margin-left: 5px;
+      }
+
+      .upload-menu {
+        background: #ffffff;
+        position: absolute;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 5px -3px,
+          rgba(0, 0, 0, 0.14) 0px 8px 10px 1px, rgba(0, 0, 0, 0.12) 0px 3px 14px;
+        border: solid 1px #e4e7ed;
+        width: 150px;
+        height: 90px;
+        top: 32px;
+        z-index: 99;
+        right: 55px;
+        -webkit-animation: scale-up-top 0.4s cubic-bezier(0.39, 0.575, 0.565, 1)
+          both;
+        animation: scale-up-top 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+      }
     }
   }
 
@@ -244,13 +446,26 @@ export default defineComponent({
     .path-name {
       background: #fcfcfd;
       width: calc(100% - 40px);
+      display: flex;
       svg {
         width: 20px;
         color: #7a7a7a;
         margin-left: 10px;
-        margin-top: 10px;
-        margin-right: 30px;
+        // margin-top: 10px;
+        margin-right: 15px;
         cursor: pointer;
+      }
+      .path-text {
+        cursor: pointer;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      span {
+        font-size: 8px;
+        line-height: 40px;
+        color: #969fa8;
+        font-weight: 800;
       }
     }
   }

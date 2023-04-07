@@ -3,7 +3,7 @@
     <el-scrollbar>
       <div class="content">
         <device-attribute-info :deviceConfig="deviceConfig" :status="status" />
-        <device-data :dataList="dataList" />
+        <device-data :dataList="dataList" :deviceConfig="deviceConfig"/>
       </div>
     </el-scrollbar>
   </div>
