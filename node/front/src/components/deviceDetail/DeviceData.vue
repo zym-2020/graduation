@@ -21,14 +21,21 @@
         </div>
       </div>
       <div class="btn">
+        <el-button
+          class="create-folder"
+          color="white"
+          @click="addFolderVisual = true"
+          >新增文件夹
+          <svg class="icon-svg">
+            <use xlink:href="#icon-folder-add"></use>
+          </svg>
+        </el-button>
         <el-button class="upload" color="white" @click="uploadClick"
           >上传<el-icon color="#081c42"><Upload /></el-icon
         ></el-button>
         <el-button color="#081c42" @click="refresh"
           >刷新<el-icon color="white"><Refresh /></el-icon
         ></el-button>
-
-        <div class="upload-menu" v-if="uploadFlag"></div>
       </div>
     </div>
     <div class="path">
@@ -174,6 +181,13 @@
         </el-table-column>
       </el-table>
     </div>
+
+    <el-dialog v-model="addFolderVisual" width="600">
+      <template #header>
+        <div class="my-header">新增文件夹</div>
+      </template>
+      <add-folder :path="path" @addFolderCall="addFolderCall" />
+    </el-dialog>
   </div>
 </template>
 
@@ -188,9 +202,10 @@ import {
 } from "vue";
 import { dateFormat, formatFileSize } from "@/utils/common";
 import { TableDataType } from "@/type";
-import { getDeviceData } from "@/api/request";
+import { getDeviceData, createFolder } from "@/api/request";
 import { DeviceConfig } from "@/type";
 import router from "@/router";
+import AddFolder from "./AddFolder.vue";
 export default defineComponent({
   props: {
     dataList: {
@@ -200,6 +215,7 @@ export default defineComponent({
       type: Object as PropType<DeviceConfig>,
     },
   },
+  components: { AddFolder },
   setup(props) {
     const tableHeight = ref(0);
     const contentComponent = ref<HTMLElement>();
@@ -210,6 +226,8 @@ export default defineComponent({
     const deviceConfig = computed(() => {
       return props.deviceConfig;
     });
+
+    const addFolderVisual = ref(false);
 
     const type = computed(() => {
       if (deviceConfig.value?.push) {
@@ -290,15 +308,17 @@ export default defineComponent({
       }
     };
 
+    const addFolderCall = async (val: { path: string; folder: string }) => {
+      const id: string = router.currentRoute.value.params.id as string;
+      const res = await createFolder(id, val);
+      if (res) {
+        dataList.value = res.data;
+        addFolderVisual.value = false;
+      }
+    };
+
     const uploadClick = () => {
       uploadFlag.value = true;
-      console.log(1)
-      function showUpload() {
-        console.log(2)
-        uploadFlag.value = false;
-        window.removeEventListener("click", showUpload);
-      }
-      window.addEventListener("click", showUpload);
     };
 
     nextTick(() => {
@@ -314,47 +334,20 @@ export default defineComponent({
       deviceConfig,
       type,
       uploadFlag,
+      addFolderVisual,
       dateFormat,
       formatSize,
       rowDblclickHandle,
       backClick,
       refresh,
-      uploadClick
+      uploadClick,
+      addFolderCall,
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-@-webkit-keyframes scale-up-top {
-  0% {
-    -webkit-transform: scale(0.5);
-    transform: scale(0.5);
-    -webkit-transform-origin: 50% 0%;
-    transform-origin: 50% 0%;
-  }
-  100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    -webkit-transform-origin: 50% 0%;
-    transform-origin: 50% 0%;
-  }
-}
-@keyframes scale-up-top {
-  0% {
-    -webkit-transform: scale(0.5);
-    transform: scale(0.5);
-    -webkit-transform-origin: 50% 0%;
-    transform-origin: 50% 0%;
-  }
-  100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    -webkit-transform-origin: 50% 0%;
-    transform-origin: 50% 0%;
-  }
-}
-
 .device-data {
   background: white;
   height: calc(100vh - 40px - 70px);
@@ -394,7 +387,8 @@ export default defineComponent({
       position: absolute;
       right: 20px;
       top: 20px;
-      .upload {
+      .upload,
+      .create-folder {
         box-sizing: border-box;
         border: solid 1px #081c42;
         color: #081c42;
@@ -405,21 +399,10 @@ export default defineComponent({
       .el-icon {
         margin-left: 5px;
       }
-
-      .upload-menu {
-        background: #ffffff;
-        position: absolute;
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 5px -3px,
-          rgba(0, 0, 0, 0.14) 0px 8px 10px 1px, rgba(0, 0, 0, 0.12) 0px 3px 14px;
-        border: solid 1px #e4e7ed;
-        width: 150px;
-        height: 90px;
-        top: 32px;
-        z-index: 99;
-        right: 55px;
-        -webkit-animation: scale-up-top 0.4s cubic-bezier(0.39, 0.575, 0.565, 1)
-          both;
-        animation: scale-up-top 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+      .icon-svg {
+        margin-left: 5px;
+        height: 16px;
+        width: 16px;
       }
     }
   }
@@ -489,6 +472,10 @@ export default defineComponent({
         }
       }
     }
+  }
+
+  .my-header {
+    font-size: 20px;
   }
 }
 </style>

@@ -28,4 +28,6 @@ public interface DeviceManageService {
 
     List<Map<String, Object>> getDeviceData(String deviceId, String path);
 
+    List<Map<String, Object>> createFolder(String deviceId, String path, String folder);
+
 }

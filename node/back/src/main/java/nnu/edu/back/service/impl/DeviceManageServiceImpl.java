@@ -149,4 +149,23 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         return result;
     }
 
+    @Override
+    public List<Map<String, Object>> createFolder(String deviceId, String path, String folder) {
+        if (path.equals("") || folder.equals("")) {
+            throw new MyException(-1, "参数错误");
+        }
+        String filePath;
+        if (path.equals("/")) {
+            filePath = dataPath + deviceId + "/" + folder;
+        } else {
+            filePath = dataPath + deviceId + "/" + path + "/" + folder;
+        }
+        File f = new File(filePath);
+        if (f.mkdirs()) {
+            return getDeviceData(deviceId, path);
+        } else {
+            throw new MyException(-1, "请检查是否文件重名");
+        }
+
+    }
 }

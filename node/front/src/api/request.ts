@@ -25,6 +25,13 @@ export const getDeviceData = async (
   return post(`/device/getDeviceData/${deviceId}`, true, jsonDtaa);
 };
 
+export const createFolder = async (
+  deviceId: string,
+  jsonData: { path: string; folder: string }
+) => {
+  return post(`/device/createFolder/${deviceId}`, true, jsonData);
+};
+
 //receiveRealTimeData相关接口
 export const checkPort = async (port: number) => {
   return get(`/receiveRealTimeData/checkPort/${port}`, true);
