@@ -24,6 +24,9 @@ public class Action {
     @XStreamAsAttribute
     String id;
 
+    @XStreamAsAttribute
+    String name;
+
     @XStreamImplicit(itemFieldName = "step")
     List<ActionStep> steps;
 }

@@ -35,6 +35,11 @@
             <div class="value">{{ item.value }}</div>
           </div>
         </el-tab-pane>
+        <el-tab-pane label="设备行为" name="action">
+          <div class="action">
+            <device-action></device-action>
+          </div>
+        </el-tab-pane>
         <el-tab-pane label="设备状态" name="state">
           <div class="state">
             <div :class="status.state === 1 ? 'state-dot' : 'state-dot stop'" />
@@ -86,7 +91,9 @@ import { DeviceConfig } from "@/type";
 import { imgBase64, notice, dateFormat } from "@/utils/common";
 import { prefix } from "@/prefix";
 import { startTCPServer, stopTCPServer } from "@/api/request";
+import DeviceAction from "./DeviceAction.vue";
 export default defineComponent({
+  components: { DeviceAction },
   props: {
     deviceConfig: {
       type: Object as PropType<DeviceConfig>,

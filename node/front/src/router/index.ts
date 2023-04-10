@@ -82,6 +82,20 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: "/manageScript",
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "ManageScript",
+        component: () => import("@/views/ManageScript.vue"),
+        meta: {
+          keepAlive: true,
+        },
+      },
+    ],
+  },
+  {
     path: "/404",
     name: "404",
     component: () => import("@/views/404.vue"),

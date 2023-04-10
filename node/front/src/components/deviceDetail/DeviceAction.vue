@@ -1,11 +1,29 @@
 <template>
-  <div class="file-directory">
+  <div class="device-action">
+    <div class="btn">
+      <el-button type="success" plain size="small">添加行为</el-button>
+    </div>
     <el-tree :data="data" :props="defaultProps">
       <template #default="{ node, data }">
         <span class="custom-tree-node">
-          <el-icon v-if="data.children"><FolderOpened /></el-icon>
-          <el-icon v-else><Folder /></el-icon>
-          <span>{{ node.label }}</span>
+          <svg class="icon-svg" v-if="data.type === 'action'">
+            <use xlink:href="#icon-actionscript"></use>
+          </svg>
+          <svg class="icon-svg" v-if="data.type === 'script'">
+            <use xlink:href="#icon-script"></use>
+          </svg>
+          <svg class="icon-svg" v-if="data.type === 'param'">
+            <use xlink:href="#icon-parameter"></use>
+          </svg>
+          <span :class="data.type">{{ node.label }}</span>
+          <el-icon
+            v-if="data.type === 'action'"
+            class="plus-icon"
+            @click.prevent="addScript"
+            ><CirclePlus
+          /></el-icon>
+          <el-icon v-if="data.type === 'param'"><Switch /></el-icon>
+          <el-icon v-else><CircleClose /></el-icon>
         </span>
       </template>
     </el-tree>
@@ -24,29 +42,59 @@ export default defineComponent({
 
     const data: Tree[] = [
       {
-        label: "Root",
+        label: "Action1",
+        type: "action",
         children: [
           {
             label: "RawData",
-          },
-          {
-            label: "DeriveData",
+            type: "script",
+            children: [
+              {
+                label: "data",
+                type: "param",
+              },
+              {
+                label: "path",
+                type: "param",
+              },
+              {
+                label: "station",
+                type: "param",
+              },
+            ],
           },
         ],
       },
     ];
 
-    return { defaultProps, data };
+    const addScript = () => {};
+
+    return { defaultProps, data, addScript };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.file-directory {
-  margin-top: 20px;
+.device-action {
+  .btn {
+    position: relative;
+    height: 30px;
+    .el-button {
+      right: 0px;
+      position: absolute;
+      //   box-sizing: border-box;
+      //   border: solid 1px #081c42;
+      //   color: #081c42;
+      //   &:hover {
+      //     background: #f5f6f8;
+      //   }
+    }
+  }
+
   /deep/ .el-tree > .el-tree-node {
     min-width: calc(100% - 16px);
     display: inline-block;
+    line-height: 40px;
   }
 
   .el-icon {
@@ -113,6 +161,38 @@ export default defineComponent({
     }
     .el-tree-node__content {
       height: 40px;
+    }
+  }
+
+  .custom-tree-node {
+    width: 100%;
+    display: flex;
+    position: relative;
+    .icon-svg {
+      width: 16px;
+      height: 16px;
+      margin-top: 12px;
+      margin-right: 5px;
+    }
+    .action {
+      color: #f44336;
+      //   font-weight: 600;
+    }
+    .param {
+      color: #9292a0;
+    }
+
+    .el-icon {
+      position: absolute;
+      right: 0px;
+      top: 13px;
+      &:hover {
+        color: #409eff;
+      }
+    }
+
+    .plus-icon {
+      right: 20px;
     }
   }
 }

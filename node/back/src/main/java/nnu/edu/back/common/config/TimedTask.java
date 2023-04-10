@@ -17,7 +17,7 @@ public class TimedTask {
     @Value("${tempPath}")
     String tempPath;
 
-    @Scheduled(cron = "0 0 * * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void clearTempFile() {
         FileUtil.clearTempFile(tempPath);
     }

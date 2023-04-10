@@ -55,6 +55,21 @@ export interface DeviceConfig {
   actions?: DeviceActions;
 }
 
+export interface ScriptConfig {
+  id: string;
+  name: string;
+  description: string;
+  parameters: {
+    parameterList: {
+      name: string;
+      description: string | null;
+      example: string | null;
+      type: string;
+    }[];
+  };
+  enter: string;
+}
+
 export interface DevicePojo {
   id: string;
   name: string | null;
@@ -68,9 +83,16 @@ export interface DevicePojo {
   register: boolean;
 }
 
+export interface ScriptPojo {
+  id: string;
+  name: string;
+  description: string;
+}
+
 export interface Tree {
   label: string;
   children?: Tree[];
+  type: string;
 }
 
 export interface TableDataType {

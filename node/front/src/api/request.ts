@@ -3,49 +3,68 @@ import { DeviceConfig } from "@/type";
 
 //device相关接口
 export const uploadPicture = async (formData: FormData) => {
-  return post(`/device/uploadPicture`, false, formData);
+  return await post(`/device/uploadPicture`, false, formData);
 };
 
 export const initDevice = async (jsonData: Omit<DeviceConfig, "id">) => {
-  return post(`/device/initDevice`, true, jsonData);
+  return await post(`/device/initDevice`, true, jsonData);
 };
 
 export const getAllDevice = async () => {
-  return get(`/device/getAllDevice`, true);
+  return await get(`/device/getAllDevice`, true);
 };
 
 export const getDeviceInfo = async (deviceId: string) => {
-  return get(`/device/getDeviceInfo/${deviceId}`, true);
+  return await get(`/device/getDeviceInfo/${deviceId}`, true);
 };
 
 export const getDeviceData = async (
   deviceId: string,
   jsonDtaa: { path: string }
 ) => {
-  return post(`/device/getDeviceData/${deviceId}`, true, jsonDtaa);
+  return await post(`/device/getDeviceData/${deviceId}`, true, jsonDtaa);
 };
 
 export const createFolder = async (
   deviceId: string,
   jsonData: { path: string; folder: string }
 ) => {
-  return post(`/device/createFolder/${deviceId}`, true, jsonData);
+  return await post(`/device/createFolder/${deviceId}`, true, jsonData);
 };
 
 //receiveRealTimeData相关接口
 export const checkPort = async (port: number) => {
-  return get(`/receiveRealTimeData/checkPort/${port}`, true);
+  return await get(`/receiveRealTimeData/checkPort/${port}`, true);
 };
 
 export const startTCPServer = async (port: number, deviceId: string) => {
-  return post(`/receiveRealTimeData/startTCPServer/${port}/${deviceId}`, true);
+  return await post(
+    `/receiveRealTimeData/startTCPServer/${port}/${deviceId}`,
+    true
+  );
 };
 
 export const stopTCPServer = async (port: number, deviceId: string) => {
-  return post(`/receiveRealTimeData/stopTCPServer/${port}/${deviceId}`, true);
+  return await post(
+    `/receiveRealTimeData/stopTCPServer/${port}/${deviceId}`,
+    true
+  );
 };
 
 //SSE接口
 export const overSSE = async (type: string, id: string) => {
-  return get(`/SSE/over/${type}/${id}`, true);
+  return await get(`/SSE/over/${type}/${id}`, true);
+};
+
+//script相关接口
+export const pageQuery = async (jsonData: {
+  size: number;
+  page: number;
+  keyword: string;
+}) => {
+  return await post(`/script/pageQuery`, true, jsonData);
+};
+
+export const getScriptConfig = async (scriptId: string) => {
+  return await get(`/script/getScriptConfig/${scriptId}`, true);
 };

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nnu.edu.back.dao.manage.ScriptMapper">
+    <resultMap id="ScriptMap" type="nnu.edu.back.pojo.Script">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="description" property="description"></result>
+    </resultMap>
+
+    <select id="pageQuery" resultMap="ScriptMap">
+        select * from script
+        <if test="keyword != ''">
+            where name like #{keyword} or description like #{keyword}
+        </if>
+        order by id limit #{size} offset #{start}
+    </select>
+
+    <select id="countAll" resultType="java.lang.Integer">
+        select count(*) from script
+        <if test="keyword != ''">
+            where name like #{keyword} or description like #{keyword}
+        </if>
+    </select>
+</mapper>

@@ -124,7 +124,7 @@ public class FileUtil {
         long nowTime = System.currentTimeMillis();
         for (File file : files) {
             if (nowTime - 1000 * 60 * 60 * 24 > file.lastModified()) {
-                deleteFileOrFolder(f);
+                deleteFileOrFolder(file);
             }
         }
     }

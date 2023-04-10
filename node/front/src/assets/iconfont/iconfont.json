@@ -6,6 +6,41 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "34971186",
+      "name": "Run TestCafe Script-45-copy",
+      "font_class": "code-script-yellow-copy",
+      "unicode": "ee4b",
+      "unicode_decimal": 61003
+    },
+    {
+      "icon_id": "34971199",
+      "name": "Run TestCafe Script-45-copy",
+      "font_class": "code-script-white",
+      "unicode": "ee4c",
+      "unicode_decimal": 61004
+    },
+    {
+      "icon_id": "22273655",
+      "name": "parameter",
+      "font_class": "parameter",
+      "unicode": "e6ee",
+      "unicode_decimal": 59118
+    },
+    {
+      "icon_id": "587088",
+      "name": "script",
+      "font_class": "script",
+      "unicode": "e7e9",
+      "unicode_decimal": 59369
+    },
+    {
+      "icon_id": "13302927",
+      "name": "actionscript",
+      "font_class": "actionscript",
+      "unicode": "e627",
+      "unicode_decimal": 58919
+    },
+    {
       "icon_id": "4766848",
       "name": "folder-add",
       "font_class": "folder-add",

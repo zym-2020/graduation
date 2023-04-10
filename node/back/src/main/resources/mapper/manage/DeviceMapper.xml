@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="nnu.edu.back.dao.manage.DeviceMapper">
-    <resultMap id="deviceMap" type="nnu.edu.back.pojo.Device">
+    <resultMap id="DeviceMap" type="nnu.edu.back.pojo.Device">
         <id column="id" property="id"></id>
         <result column="name" property="name"></result>
         <result column="picture" property="picture"></result>
@@ -14,7 +14,7 @@
         <result column="register" property="register"></result>
     </resultMap>
 
-    <select id="queryByPort" resultMap="deviceMap">
+    <select id="queryByPort" resultMap="DeviceMap">
         select * from device where port = #{port}
     </select>
 
@@ -22,11 +22,11 @@
         insert into device values(#{device.id}, #{device.name}, #{device.picture}, #{device.longitude}, #{device.latitude}, #{device.description}, #{device.port}, #{device.state}, #{device.lastUpdate})
     </insert>
 
-    <select id="getAllDevice" resultMap="deviceMap">
+    <select id="getAllDevice" resultMap="DeviceMap">
         select * from device order by id
     </select>
 
-    <select id="queryDeviceById" resultMap="deviceMap">
+    <select id="queryDeviceById" resultMap="DeviceMap">
         select * from device where id::text = #{id}
     </select>
 

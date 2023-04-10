@@ -19,15 +19,6 @@
         <el-icon><HomeFilled /></el-icon>
         <span>首页</span>
       </el-menu-item>
-      <!-- <el-sub-menu index="2">
-        <template #title>
-          <el-icon><Setting /></el-icon>
-          <span>挂载设备</span>
-        </template>
-        <el-menu-item index="2-1">实时推送</el-menu-item>
-        <el-menu-item index="2-2">手动输入</el-menu-item>
-        <el-menu-item index="2-3">定时捞取</el-menu-item>
-      </el-sub-menu> -->
       <el-menu-item index="2">
         <el-icon><Setting /></el-icon>
         <span>挂载设备</span>
@@ -44,12 +35,21 @@
         <el-icon><Menu /></el-icon>
         <span>管理设备</span>
       </el-menu-item>
+      <el-menu-item index="6">
+        <svg class="icon-svg" v-if="pathName === 'ManageScript'">
+          <use xlink:href="#icon-code-script-yellow-copy"></use>
+        </svg>
+        <svg class="icon-svg" v-else>
+          <use xlink:href="#icon-code-script-white"></use>
+        </svg>
+        <span>管理脚本</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import router from "@/router";
 export default defineComponent({
   setup() {
@@ -66,13 +66,19 @@ export default defineComponent({
             return "4";
           case "ManageDevice":
             return "5";
-          case "DeviceDetail":
-            return "5";
+          // case "DeviceDetail":
+          //   return "5";
+          case "ManageScript":
+            return "6";
           default:
             return "1";
         }
       })()
     );
+
+    const pathName = computed(() => {
+      return router.currentRoute.value.name;
+    });
 
     const selectHandle = (key: string) => {
       switch (key) {
@@ -91,12 +97,16 @@ export default defineComponent({
         case "5":
           router.push({ path: "/manageDevice" });
           break;
+        case "6":
+          router.push({ path: "/manageScript" });
+          break;
       }
     };
 
     return {
       active,
       selectHandle,
+      pathName,
     };
   },
 });
@@ -129,6 +139,11 @@ export default defineComponent({
   .el-menu {
     font-weight: 600;
     border: none;
+    .icon-svg {
+      margin-right: 5px;
+      width: 25px;
+      height: 25px;
+    }
   }
 }
 </style>
