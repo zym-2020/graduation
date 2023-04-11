@@ -8,7 +8,8 @@ export const toIdPages = async (to: RouteLocationNormalized) => {
     if (res && data) {
       to.params.device = res.data.device;
       to.params.status = res.data.status;
-      to.params.dataList = data.data
+      to.params.scriptMap = res.data.scriptMap;
+      to.params.dataList = data.data;
       return 1;
     } else {
       return -1;

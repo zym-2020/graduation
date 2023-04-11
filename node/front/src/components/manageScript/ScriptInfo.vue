@@ -15,7 +15,8 @@
           :key="index"
         >
           <el-col :span="4" class="name">
-            <el-badge is-dot class="item"
+            <span v-if="item.optional">{{ item.name }}</span>
+            <el-badge is-dot class="item" v-else
               ><span>{{ item.name }}</span></el-badge
             >
           </el-col>
@@ -82,9 +83,11 @@ export default defineComponent({
       .example {
         color: #b2b2cb;
         font-size: 11px;
+        line-height: 24px;
       }
       .description {
-        word-wrap: normal;
+        word-wrap: break-word;
+        word-break: break-all;
       }
     }
   }

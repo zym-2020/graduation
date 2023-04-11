@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "12225043",
+      "name": "必选",
+      "font_class": "bixuan",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
       "icon_id": "219343",
       "name": "code",
       "font_class": "code1",

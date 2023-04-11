@@ -3,73 +3,121 @@
     <div class="btn">
       <el-button type="success" plain size="small">添加行为</el-button>
     </div>
-    <el-tree :data="data" :props="defaultProps">
-      <template #default="{ node, data }">
-        <span class="custom-tree-node">
-          <svg class="icon-svg" v-if="data.type === 'action'">
-            <use xlink:href="#icon-actionscript"></use>
-          </svg>
-          <svg class="icon-svg" v-if="data.type === 'script'">
-            <use xlink:href="#icon-script"></use>
-          </svg>
-          <svg class="icon-svg" v-if="data.type === 'param'">
-            <use xlink:href="#icon-parameter"></use>
-          </svg>
-          <span :class="data.type">{{ node.label }}</span>
-          <el-icon
-            v-if="data.type === 'action'"
-            class="plus-icon"
-            @click.prevent="addScript"
-            ><CirclePlus
-          /></el-icon>
-          <el-icon v-if="data.type === 'param'"><Switch /></el-icon>
-          <el-icon v-else><CircleClose /></el-icon>
-        </span>
+    <el-scrollbar :max-height="maxHeight">
+      <el-tree :data="treeData" :props="defaultProps">
+        <template #default="{ node, data }">
+          <span class="custom-tree-node">
+            <svg class="icon-svg" v-if="data.type === 'action'">
+              <use xlink:href="#icon-actionscript"></use>
+            </svg>
+            <svg class="icon-svg" v-if="data.type === 'script'">
+              <use xlink:href="#icon-script"></use>
+            </svg>
+            <svg class="icon-svg" v-if="data.type === 'param'">
+              <use xlink:href="#icon-parameter"></use>
+            </svg>
+            <span :class="data.type">{{ node.label }}</span>
+            <el-icon
+              v-if="data.type === 'action'"
+              class="plus-icon"
+              @click.prevent="addScript"
+              ><CirclePlus
+            /></el-icon>
+            <el-icon v-if="data.type === 'param'" @click="paramClick(data.id)"
+              ><Switch
+            /></el-icon>
+            <el-icon v-else><CircleClose /></el-icon>
+          </span>
+        </template>
+      </el-tree>
+    </el-scrollbar>
+
+    <el-dialog v-model="paramSettingDialog" width="800">
+      <template #header>
+        <div class="my-header">
+          <span>{{ scriptName }}</span>
+          参数配置
+        </div>
       </template>
-    </el-tree>
+      <param-setting :scriptId="scriptId" />
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { Tree } from "@/type";
+import { computed, defineComponent, PropType, ref } from "vue";
+import { Tree, DeviceActions } from "@/type";
+import router from "@/router";
+import ParamSetting from "./ParamSetting.vue";
 export default defineComponent({
-  setup() {
+  props: {
+    actions: {
+      type: Object as PropType<DeviceActions>,
+    },
+  },
+  components: { ParamSetting },
+  setup(props) {
+    const scriptMap = router.currentRoute.value.params.scriptMap as any;
     const defaultProps = {
       children: "children",
       label: "label",
     };
+    const paramSettingDialog = ref(false);
+    const scriptId = ref("");
+    const scriptName = computed(() => {
+      return scriptMap[scriptId.value];
+    });
 
-    const data: Tree[] = [
-      {
-        label: "Action1",
-        type: "action",
-        children: [
-          {
-            label: "RawData",
-            type: "script",
-            children: [
-              {
-                label: "data",
-                type: "param",
-              },
-              {
-                label: "path",
-                type: "param",
-              },
-              {
-                label: "station",
-                type: "param",
-              },
-            ],
-          },
-        ],
-      },
-    ];
+    const treeData = computed(() => {
+      if (props.actions) {
+        const data: Tree[] = [];
+        props.actions.actionList.forEach((item) => {
+          let stepArr: Tree[] = [];
+          item.steps.forEach((step) => {
+            let paramArr: Tree[] = [];
+            step.parameters.parameterList.forEach((param) => {
+              paramArr.push({ label: param, type: "param", id: step.script });
+            });
+            stepArr.push({
+              id: step.script,
+              label: scriptMap[step.script],
+              type: "script",
+              children: paramArr,
+            });
+          });
+          data.push({
+            label: item.name,
+            type: "action",
+            children: stepArr,
+            id: item.id,
+          });
+        });
+        return data;
+      } else return [];
+    });
+
+    const maxHeight = computed(() => {
+      const height = document.documentElement.clientHeight;
+      return height - (40 + 70 + 40) - (200 + 70 + 40 + 20);
+    });
 
     const addScript = () => {};
 
-    return { defaultProps, data, addScript };
+    const paramClick = (id: string) => {
+      scriptId.value = id;
+      paramSettingDialog.value = true;
+    };
+
+    return {
+      defaultProps,
+      treeData,
+      maxHeight,
+      paramSettingDialog,
+      scriptId,
+      scriptName,
+      addScript,
+      paramClick,
+    };
   },
 });
 </script>
@@ -193,6 +241,13 @@ export default defineComponent({
 
     .plus-icon {
       right: 20px;
+    }
+  }
+
+  .my-header {
+    font-size: 20px;
+    span {
+      color: black;
     }
   }
 }

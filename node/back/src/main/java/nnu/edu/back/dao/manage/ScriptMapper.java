@@ -20,4 +20,6 @@ public interface ScriptMapper {
     int countAll(@Param("keyword") String keyword);
 
     void addScript(@Param("script") Script script);
+
+    String getNameById(@Param("id") String id);
 }

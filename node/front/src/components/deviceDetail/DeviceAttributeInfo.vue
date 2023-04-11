@@ -37,7 +37,7 @@
         </el-tab-pane>
         <el-tab-pane label="设备行为" name="action">
           <div class="action">
-            <device-action></device-action>
+            <device-action :actions="deviceConfig.actions"></device-action>
           </div>
         </el-tab-pane>
         <el-tab-pane label="设备状态" name="state">
@@ -92,62 +92,65 @@ import { imgBase64, notice, dateFormat } from "@/utils/common";
 import { prefix } from "@/prefix";
 import { startTCPServer, stopTCPServer } from "@/api/request";
 import DeviceAction from "./DeviceAction.vue";
+import router from "@/router";
 export default defineComponent({
   components: { DeviceAction },
-  props: {
-    deviceConfig: {
-      type: Object as PropType<DeviceConfig>,
-    },
-    status: {
-      type: Object as PropType<{ state: number; lastUpdate: string }>,
-    },
-  },
-  setup(props) {
+
+  setup() {
     const imageUrl = computed(() => {
       if (
-        props.deviceConfig?.deviceConfigAttribute.picture === null ||
-        props.deviceConfig?.deviceConfigAttribute.picture === "" ||
-        props.deviceConfig?.deviceConfigAttribute.picture === undefined
+        deviceConfig.value.deviceConfigAttribute.picture === null ||
+        deviceConfig.value.deviceConfigAttribute.picture === "" ||
+        deviceConfig.value.deviceConfigAttribute.picture === undefined
       ) {
         if (
-          props.deviceConfig?.deviceConfigAttribute.name === null ||
-          props.deviceConfig?.deviceConfigAttribute.name === "" ||
-          props.deviceConfig?.deviceConfigAttribute.name === undefined
+          deviceConfig.value.deviceConfigAttribute.name === null ||
+          deviceConfig.value.deviceConfigAttribute.name === "" ||
+          deviceConfig.value.deviceConfigAttribute.name === undefined
         ) {
           return imgBase64("device");
         } else {
-          return imgBase64(props.deviceConfig?.deviceConfigAttribute.name);
+          return imgBase64(deviceConfig.value.deviceConfigAttribute.name);
         }
       } else {
         return (
           prefix +
-          `device/getPicture/${props.deviceConfig?.deviceConfigAttribute.picture}`
+          `device/getPicture/${deviceConfig.value.deviceConfigAttribute.picture}`
         );
       }
     });
 
+    const deviceConfig = computed(() => {
+      return router.currentRoute.value.params.device as unknown as DeviceConfig;
+    });
+
     const attribute = computed(() => {
-      return props.deviceConfig?.deviceConfigAttribute;
+      return (
+        router.currentRoute.value.params.device as unknown as DeviceConfig
+      ).deviceConfigAttribute;
     });
 
     const status = computed(() => {
-      return props.status;
+      return router.currentRoute.value.params.device as unknown as {
+        state: number;
+        lastUpdate: string;
+      };
     });
 
     const type = computed(() => {
-      if (props.deviceConfig?.push) {
+      if (deviceConfig.value.push) {
         return ["主动推送", ""];
-      } else if (props.deviceConfig?.typing) {
+      } else if (deviceConfig.value.typing) {
         return ["手动录入", "success"];
       }
     });
 
     const protocol = computed(() => {
-      return props.deviceConfig?.push?.protocol;
+      return deviceConfig.value.push?.protocol;
     });
 
     const port = computed(() => {
-      return props.deviceConfig?.push?.port;
+      return deviceConfig.value.push?.port;
     });
 
     const activeName = ref("description");
@@ -175,11 +178,11 @@ export default defineComponent({
     };
 
     const openClick = async () => {
-      if (props.deviceConfig?.push) {
-        if (props.deviceConfig.push.protocol === "TCP") {
+      if (deviceConfig.value.push) {
+        if (deviceConfig.value.push.protocol === "TCP") {
           const res = await startTCPServer(
-            props.deviceConfig.push.port,
-            props.deviceConfig.id
+            deviceConfig.value.push.port,
+            deviceConfig.value.id
           );
           if (res) {
             notice("success", "成功", "启动成功");
@@ -189,11 +192,11 @@ export default defineComponent({
     };
 
     const closeClick = async () => {
-      if (props.deviceConfig?.push) {
-        if (props.deviceConfig.push.protocol === "TCP") {
+      if (deviceConfig.value.push) {
+        if (deviceConfig.value.push.protocol === "TCP") {
           const res = await stopTCPServer(
-            props.deviceConfig.push.port,
-            props.deviceConfig.id
+            deviceConfig.value.push.port,
+            deviceConfig.value.id
           );
           if (res) {
             notice("success", "成功", "关闭监听");
@@ -210,6 +213,7 @@ export default defineComponent({
       type,
       port,
       protocol,
+      deviceConfig,
       textHandle,
       parameters,
       openClick,

@@ -6,10 +6,9 @@ import nnu.edu.back.common.result.ResultEnum;
 import nnu.edu.back.common.utils.FileUtil;
 import nnu.edu.back.common.utils.XmlUtil;
 import nnu.edu.back.dao.manage.DeviceMapper;
+import nnu.edu.back.dao.manage.ScriptMapper;
 import nnu.edu.back.pojo.Device;
-import nnu.edu.back.pojo.config.DeviceConfig;
-import nnu.edu.back.pojo.config.DeviceConfigAttribute;
-import nnu.edu.back.pojo.config.Push;
+import nnu.edu.back.pojo.config.*;
 import nnu.edu.back.service.DeviceManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +50,9 @@ public class DeviceManageServiceImpl implements DeviceManageService {
 
     @Autowired
     DeviceMapper deviceMapper;
+
+    @Autowired
+    ScriptMapper scriptMapper;
 
     @Override
     public String uploadDevicePicture(MultipartFile file) {
@@ -117,7 +119,13 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         }
         DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
         result.put("device", deviceConfig);
-
+        Map<String, String> map = new HashMap<>();
+        for (Action action : deviceConfig.getActions().getActionList()) {
+            for (ActionStep step : action.getSteps()) {
+                map.put(step.getScript(), scriptMapper.getNameById(step.getScript()));
+            }
+        }
+        result.put("scriptMap", map);
         return result;
     }
 

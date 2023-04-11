@@ -21,6 +21,7 @@ export interface DeviceAttribute {
 export interface DeviceActions {
   actionList: {
     id: string;
+    name: string;
     steps: {
       script: string;
       parameters: {
@@ -61,7 +62,7 @@ export interface ScriptConfig {
   description: string;
   parameters: {
     parameterList: {
-      optional: true;
+      optional: boolean;
       name: string;
       description: string | null;
       example: string | null;
@@ -91,6 +92,7 @@ export interface ScriptPojo {
 }
 
 export interface Tree {
+  id: string;
   label: string;
   children?: Tree[];
   type: string;
