@@ -1,5 +1,6 @@
 package nnu.edu.back.pojo.scriptConfig;
 
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScriptParameter {
+    @XStreamAsAttribute
+    Boolean optional;
     String name;
     String description;
     String example;

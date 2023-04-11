@@ -18,4 +18,6 @@ public interface ScriptMapper {
     List<Script> pageQuery(@Param("size") int size, @Param("start") int start, @Param("keyword") String keyword);
 
     int countAll(@Param("keyword") String keyword);
+
+    void addScript(@Param("script") Script script);
 }

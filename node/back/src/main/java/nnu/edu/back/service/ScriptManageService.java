@@ -2,6 +2,7 @@ package nnu.edu.back.service;
 
 import nnu.edu.back.pojo.Script;
 import nnu.edu.back.pojo.scriptConfig.ScriptConfig;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -17,4 +18,6 @@ public interface ScriptManageService {
     Map<String, Object> pageQuery(int size, int page, String keyword);
 
     ScriptConfig getScriptConfig(String scriptId);
+
+    void addScript(MultipartFile file);
 }

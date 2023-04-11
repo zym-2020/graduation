@@ -1,20 +1,29 @@
 <template>
   <div class="script-card">
     <div class="add" v-if="cardType === 'add'">
-      <div class="text">
-        <el-icon><Plus /></el-icon>
-        新增脚本
-      </div>
+      <el-upload
+        :action="action"
+        :multiple="false"
+        accept=".zip"
+        :show-file-list="false"
+        :on-success="successHandle"
+      >
+        <div class="text">
+          <el-icon><Plus /></el-icon>
+          新增脚本
+        </div>
+      </el-upload>
     </div>
+
     <div class="script" v-if="cardType === 'script'">
       <div class="top">
         <div class="img">
           <img src="/script-color.png" />
         </div>
         <div class="content">
-          <div class="title">{{ scriptConfig.name }}</div>
+          <div class="title">{{ scriptPojo.name }}</div>
           <div class="description">
-            {{ scriptConfig.description }}
+            {{ scriptPojo.description }}
           </div>
         </div>
       </div>
@@ -29,35 +38,53 @@
 
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from "vue";
-import { ScriptConfig } from "@/type";
-import { getScriptConfig } from "@/api/request";
+import { computed, defineComponent, PropType, ref } from "vue";
+import { ScriptPojo } from "@/type";
+import { prefix } from "@/prefix";
+import ScriptInfo from "./ScriptInfo.vue";
+import { notice } from "@/utils/common";
 export default defineComponent({
   props: {
     cardType: {
       type: String,
     },
-    scriptConfig: {
-      type: Object as PropType<ScriptConfig>,
+    scriptPojo: {
+      type: Object as PropType<ScriptPojo>,
     },
   },
-  setup(props) {
+  emits: ["scriptCardCall", "refresh"],
+  components: { ScriptInfo },
+  setup(props, context) {
+    const scriptInfoDialog = ref(false);
+    const action = `${prefix}script/addScript`;
     const cardType = computed(() => {
       return props.cardType;
     });
 
-    const scriptConfig = computed(() => {
-      return props.scriptConfig;
+    const scriptPojo = computed(() => {
+      return props.scriptPojo;
     });
 
-    const detailClick = async () => {
-      const res = await getScriptConfig(scriptConfig.value!.id);
-      if (res) {
-        console.log(res);
+    const detailClick = () => {
+      context.emit("scriptCardCall", scriptPojo.value!.id);
+    };
+
+    const successHandle = (response: any) => {
+      if (response.code === 0) {
+        context.emit("refresh");
+      } else {
+        notice("error", "错误", "请检查脚本压缩包");
       }
     };
 
-    return { cardType, scriptConfig, detailClick };
+    return {
+      action,
+      cardType,
+      scriptPojo,
+      scriptInfoDialog,
+      detailClick,
+      successHandle,
+    };
   },
 });
 </script>
@@ -81,21 +108,30 @@ export default defineComponent({
     display: flex;
     align-items: center;
 
-    .text {
-      display: flex;
-      color: #8c8c8c;
-      font-size: 14px;
-      .el-icon {
-        margin-right: 5px;
-        margin-top: 3px;
+    /deep/ .el-upload {
+      height: 100%;
+      width: 100%;
+      .text {
+        display: flex;
+        color: #8c8c8c;
+        font-size: 14px;
+        .el-icon {
+          margin-right: 5px;
+          margin-top: 3px;
+        }
       }
     }
+
     &:hover {
       border-color: #5fa9ff;
       .text {
         color: #5fa9ff;
       }
     }
+  }
+  .add > div {
+    width: 100%;
+    height: 100%;
   }
 
   .script {
@@ -158,6 +194,10 @@ export default defineComponent({
         }
       }
     }
+  }
+
+  .my-header {
+    font-size: 20px;
   }
 }
 </style>

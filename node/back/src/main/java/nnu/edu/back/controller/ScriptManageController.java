@@ -6,6 +6,7 @@ import nnu.edu.back.common.result.ResultUtils;
 import nnu.edu.back.service.ScriptManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,5 +32,12 @@ public class ScriptManageController {
     @RequestMapping(value = "/getScriptConfig/{scriptId}", method = RequestMethod.GET)
     public JsonResult getScriptConfig(@PathVariable String scriptId) {
         return ResultUtils.success(scriptManageService.getScriptConfig(scriptId));
+    }
+
+    @CrossOrigin
+    @RequestMapping(value = "/addScript", method = RequestMethod.POST)
+    public JsonResult addScript(@RequestBody MultipartFile file) {
+        scriptManageService.addScript(file);
+        return ResultUtils.success();
     }
 }

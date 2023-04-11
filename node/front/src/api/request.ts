@@ -68,3 +68,7 @@ export const pageQuery = async (jsonData: {
 export const getScriptConfig = async (scriptId: string) => {
   return await get(`/script/getScriptConfig/${scriptId}`, true);
 };
+
+export const addScript = async (formData: FormData) => {
+  return await post(`/script/addScript`, true, formData);
+};

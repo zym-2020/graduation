@@ -1,5 +1,8 @@
 package nnu.edu.back.common.utils;
 
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -127,5 +130,30 @@ public class FileUtil {
                 deleteFileOrFolder(file);
             }
         }
+    }
+
+    /**
+    * @Description:文件夹解压
+    * @Author: Yiming
+    * @Date: 2023/4/11
+    */
+    public static void unpack(String destination, String to) throws Exception {
+        File file = new File(destination);
+        if (!file.exists()) {
+            throw new Exception();
+        }
+        ZipFile zipFile = new ZipFile(destination);
+        zipFile.extractAll(to);
+    }
+
+    /**
+    * @Description:从压缩包中获取某文件的文件流
+    * @Author: Yiming
+    * @Date: 2023/4/11
+    */
+    public static InputStream getZipStream(String destination, String destinationPath) throws IOException {
+        ZipFile zipFile = new ZipFile(destination);
+        FileHeader fileHeader = zipFile.getFileHeader(destinationPath);
+        return zipFile.getInputStream(fileHeader);
     }
 }

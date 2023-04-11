@@ -21,4 +21,8 @@
             where name like #{keyword} or description like #{keyword}
         </if>
     </select>
+
+    <insert id="addScript">
+        insert into script values(#{script.id}, #{script.name}, #{script.description})
+    </insert>
 </mapper>

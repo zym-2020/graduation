@@ -61,6 +61,7 @@ export interface ScriptConfig {
   description: string;
   parameters: {
     parameterList: {
+      optional: true;
       name: string;
       description: string | null;
       example: string | null;

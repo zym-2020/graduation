@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "219343",
+      "name": "code",
+      "font_class": "code1",
+      "unicode": "e647",
+      "unicode_decimal": 58951
+    },
+    {
       "icon_id": "34971186",
       "name": "Run TestCafe Script-45-copy",
       "font_class": "code-script-yellow-copy",
