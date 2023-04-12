@@ -161,6 +161,31 @@ public class DeviceManageServiceImpl implements DeviceManageService {
     }
 
     @Override
+    public List<Map<String, Object>> getDeviceFolder(String deviceId, String path) {
+        String destination;
+        if (path.equals("/")) {
+            destination = dataPath + deviceId;
+        } else {
+            destination = dataPath + deviceId + "/" + path;
+        }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        File file = new File(destination);
+        List<Map<String, Object>> result = new ArrayList<>();
+        File[] files = file.listFiles();
+        for (File f : files) {
+            if (!f.isFile()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("name", f.getName());
+                map.put("lastUpdate", dateFormat.format(new Date(f.lastModified())));
+                map.put("type", "folder");
+                result.add(map);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public List<Map<String, Object>> createFolder(String deviceId, String path, String folder) {
         if (path.equals("") || folder.equals("")) {
             throw new MyException(-1, "参数错误");

@@ -1,45 +1,7 @@
 <template>
-  <div class="device-data">
-    <div class="head">
-      <svg fill="currentcolor" viewBox="0 0 256 256" style="color: #081c42">
-        <g>
-          <path
-            d="M244.1,8.4c-3.9-5.3-10.1-8.5-16.7-8.5H21.6C15,0,8.8,3.1,4.9,8.4C0.8,14-0.9,21,0.3,27.9 c5.1,29.6,15.8,91.9,24.3,141.7v0.1C29,195,32.8,217.1,35,229.9c1.4,10.8,10.4,18.9,21.3,19.3h136.5 c10.9-0.4,19.9-8.5,21.3-19.3l10.3-60.1l0.1-0.4L238.4,88v-0.2l10.3-59.9C249.9,21,248.3,14,244.1,8.4 M206.1,177h-163 l-3.2-18.6h169.3L206.1,177z M220,95.3H28.9l-3.2-18.6h197.4L220,95.3z"
-          ></path>
-        </g>
-      </svg>
-      <div class="title">
-        <div class="title-one">工作空间</div>
-        <div class="title-two">
-          <span class="key">设备：</span>
-          <span class="value">{{
-            deviceConfig.deviceConfigAttribute.name
-          }}</span>
-          &ensp;&ensp;&ensp;
-          <span class="key">类型：</span>
-          <span class="value">{{ type }}</span>
-        </div>
-      </div>
-      <div class="btn">
-        <el-button
-          class="create-folder"
-          color="white"
-          @click="addFolderVisual = true"
-          >新增文件夹
-          <svg class="icon-svg">
-            <use xlink:href="#icon-folder-add"></use>
-          </svg>
-        </el-button>
-        <el-button class="upload" @click="uploadClick"
-          >上传<el-icon color="#081c42"><Upload /></el-icon
-        ></el-button>
-        <el-button color="#081c42" @click="refresh"
-          >刷新<el-icon color="white"><Refresh /></el-icon
-        ></el-button>
-      </div>
-    </div>
+  <div class="param-select">
     <div class="path">
-      <div class="left-icon" @click="backClick">
+      <div class="back" @click="backClick">
         <el-icon><ArrowLeftBold /></el-icon>
       </div>
       <div class="path-name">
@@ -68,15 +30,14 @@
         </div>
       </div>
     </div>
-
-    <div class="content" ref="contentComponent">
-      <el-empty description="暂无数据" v-if="dataList.length === 0" />
+    <el-skeleton :rows="5" animated v-if="skeletonFlag" />
+    <div class="content">
       <el-table
         :data="dataList"
-        :max-height="tableHeight"
+        max-height="350"
         @row-dblclick="rowDblclickHandle"
+        @row-click="rowClickHandle"
         v-loading="loading"
-        v-else
       >
         <el-table-column label="名称">
           <template #default="scope">
@@ -181,83 +142,91 @@
         </el-table-column>
       </el-table>
     </div>
-
-    <el-dialog v-model="addFolderVisual" width="600">
-      <template #header>
-        <div class="my-header">新增文件夹</div>
-      </template>
-      <add-folder :path="path" @addFolderCall="addFolderCall" />
-    </el-dialog>
+    <div class="comfirm">
+      <div class="file-folder">
+        <div class="title" v-if="paramType === 'path'">文件夹：</div>
+        <div class="title" v-else>文件名：</div>
+        <div class="text-box">{{ result }}</div>
+      </div>
+      <div class="btn">
+        <el-button
+          color="#081c42"
+          :disabled="disabledFlag"
+          @click="comfirmClick"
+          >{{ paramType === "path" ? "选择文件夹" : "选择文件" }}</el-button
+        >
+        <el-button class="cancel" @click="cancelClick">取消</el-button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, ref } from "vue";
-import { dateFormat, formatFileSize } from "@/utils/common";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { TableDataType } from "@/type";
-import { getDeviceData, createFolder } from "@/api/request";
-import { DeviceConfig } from "@/type";
+import { dateFormat, formatFileSize } from "@/utils/common";
+import { getDeviceData, getDeviceFolder } from "@/api/request";
 import router from "@/router";
-import AddFolder from "./AddFolder.vue";
 export default defineComponent({
-  components: { AddFolder },
-  setup() {
-    const tableHeight = ref(0);
-    const contentComponent = ref<HTMLElement>();
-    const path = ref<string[]>([]);
+  props: {
+    paramType: {
+      type: String,
+    },
+  },
+  emits: ["cancelCall", "confirmCall"],
+  setup(props, context) {
+    const skeletonFlag = ref(true);
     const loading = ref(false);
-    const uploadFlag = ref(false);
-    const addFolderVisual = ref(false);
-    const dataList = ref([
-      ...(router.currentRoute.value.params
-        .dataList as unknown as TableDataType[]),
-    ]);
-
-    const deviceConfig = computed(() => {
-      return router.currentRoute.value.params.device as unknown as DeviceConfig;
+    const dataList = ref<TableDataType[]>([]);
+    const path = ref<string[]>([]);
+    const result = ref("");
+    const disabledFlag = computed(() => {
+      return result.value === "" ? true : false;
+    });
+    const paramType = computed(() => {
+      return props.paramType;
     });
 
-    const type = computed(() => {
-      if (deviceConfig.value?.push) {
-        return "主动推送";
-      } else if (deviceConfig.value?.typing) {
-        if (deviceConfig.value.typing.type === "input") {
-          return "手动录入（输入）";
-        } else {
-          return "手动录入（文件）";
-        }
-      }
-    });
-
-    const formatSize = (type: "file" | "folder", size: number) => {
-      if (type === "folder") {
-        return "-";
+    const rowClickHandle = (row: TableDataType) => {
+      if (paramType.value === "path") {
+        result.value = row.name;
       } else {
-        return formatFileSize(size);
+        if (row.type === "file") {
+          result.value = row.name;
+        }
       }
     };
 
     const rowDblclickHandle = async (row: TableDataType) => {
       if (row.type === "folder") {
-        const id = router.currentRoute.value.params.id;
+        const id = router.currentRoute.value.params.id as string;
         loading.value = true;
         let p = "";
         path.value.forEach((item) => {
           p += item + "/";
         });
         p += row.name;
-        const res = await getDeviceData(id as string, { path: p });
-        if (res) {
-          dataList.value = res.data;
-          path.value.push(row.name);
-          loading.value = false;
+        if (paramType.value === "path") {
+          const res = await getDeviceFolder({ deviceId: id, path: p });
+          if (res) {
+            dataList.value = res.data;
+            path.value.push(row.name);
+            loading.value = false;
+          }
+        } else {
+          const res = await getDeviceData(id as string, { path: p });
+          if (res) {
+            dataList.value = res.data;
+            path.value.push(row.name);
+            loading.value = false;
+          }
         }
       }
     };
 
     const backClick = async () => {
       if (path.value.length > 0) {
-        const id = router.currentRoute.value.params.id;
+        const id = router.currentRoute.value.params.id as string;
         loading.value = true;
         let p = "";
         if (path.value.length <= 1) {
@@ -268,139 +237,100 @@ export default defineComponent({
           }
           p = p.substring(0, -1);
         }
-        const res = await getDeviceData(id as string, { path: p });
+        if (paramType.value === "path") {
+          const res = await getDeviceFolder({ deviceId: id, path: p });
+          if (res) {
+            dataList.value = res.data;
+            path.value.splice(path.value.length - 1, 1);
+            loading.value = false;
+            result.value =
+              path.value.length > 0 ? path.value[path.value.length - 1] : "";
+          }
+        } else {
+          const res = await getDeviceData(id, { path: p });
+          if (res) {
+            dataList.value = res.data;
+            path.value.splice(path.value.length - 1, 1);
+            loading.value = false;
+            result.value = "";
+          }
+        }
+      }
+    };
+
+    const cancelClick = () => {
+      context.emit("cancelCall");
+    };
+
+    const comfirmClick = () => {
+      context.emit("confirmCall", { path: path.value, result: result.value });
+    };
+
+    const formatSize = (type: "file" | "folder", size: number) => {
+      if (type === "folder") {
+        return "-";
+      } else {
+        return formatFileSize(size);
+      }
+    };
+
+    const init = async () => {
+      skeletonFlag.value = true;
+      if (paramType.value === "path") {
+        const res = await getDeviceFolder({
+          deviceId: router.currentRoute.value.params.id as string,
+          path: "/",
+        });
         if (res) {
           dataList.value = res.data;
-          path.value.splice(path.value.length - 1, 1);
-          loading.value = false;
-        }
-      }
-    };
-
-    const refresh = async () => {
-      let p = "";
-      if (path.value.length > 0) {
-        p = path.value[0];
-        for (let i = 1; i < path.value.length; i++) {
-          p += "/" + path.value[i];
         }
       } else {
-        p = "/";
+        const res = await getDeviceData(
+          router.currentRoute.value.params.id as string,
+          { path: "/" }
+        );
+        if (res) {
+          dataList.value = res.data;
+        }
       }
-      const id: string = router.currentRoute.value.params.id as string;
-      loading.value = true;
-      const res = await getDeviceData(id, { path: p });
-      if (res) {
-        dataList.value = res.data;
-        loading.value = false;
-      }
+      skeletonFlag.value = false;
     };
 
-    const addFolderCall = async (val: { path: string; folder: string }) => {
-      const id: string = router.currentRoute.value.params.id as string;
-      const res = await createFolder(id, val);
-      if (res) {
-        dataList.value = res.data;
-        addFolderVisual.value = false;
-      }
-    };
-
-    const uploadClick = () => {
-      uploadFlag.value = true;
-    };
-
-    nextTick(() => {
-      tableHeight.value = contentComponent.value!.clientHeight - 40;
+    onMounted(async () => {
+      await init();
     });
 
     return {
-      contentComponent,
-      tableHeight,
-      path,
-      dataList,
       loading,
-      deviceConfig,
-      type,
-      uploadFlag,
-      addFolderVisual,
-      dateFormat,
+      dataList,
+      skeletonFlag,
+      path,
+      paramType,
+      result,
+      disabledFlag,
       formatSize,
+      dateFormat,
       rowDblclickHandle,
+      rowClickHandle,
       backClick,
-      refresh,
-      uploadClick,
-      addFolderCall,
+      cancelClick,
+      comfirmClick,
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.device-data {
-  background: white;
-  height: calc(100vh - 40px - 70px);
-
-  .head {
-    height: 80px;
-    padding: 20px;
-    box-sizing: border-box;
-    border-bottom: solid 1px #e4e7ed;
-    position: relative;
-    svg {
-      width: 25px;
-    }
-
-    .title {
-      position: absolute;
-      top: 20px;
-      left: 60px;
-      font-family: "Helvetica Neue", Helvetica, "PingFang SC",
-        "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-      .title-one {
-        margin-bottom: 5px;
-        color: #081c42;
-        font-size: 16px;
-        font-weight: 600;
-      }
-      .title-two {
-        color: #969fa8;
-        font-size: 12px;
-        .value {
-          font-weight: 700;
-        }
-      }
-    }
-
-    .btn {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      .upload,
-      .create-folder {
-        box-sizing: border-box;
-        border: solid 1px #081c42;
-        color: #081c42;
-        &:hover {
-          background: #f5f6f8;
-        }
-      }
-      .el-icon {
-        margin-left: 5px;
-      }
-      .icon-svg {
-        margin-left: 5px;
-        height: 16px;
-        width: 16px;
-      }
-    }
-  }
-
+.param-select {
   .path {
     height: 40px;
+    width: 100%;
     box-sizing: border-box;
-    border-bottom: solid 1px #e4e7ed;
+    background: #fcfcfd;
+    border: solid 1px #e4e7ed;
+    border-radius: 4px;
     display: flex;
-    .left-icon {
+    .back {
       width: 40px;
       box-sizing: border-box;
       border-right: solid 1px #e4e7ed;
@@ -415,7 +345,6 @@ export default defineComponent({
       }
     }
     .path-name {
-      background: #fcfcfd;
       width: calc(100% - 40px);
       display: flex;
       svg {
@@ -440,10 +369,9 @@ export default defineComponent({
       }
     }
   }
-
   .content {
-    padding: 20px;
-    height: calc(100% - 160px);
+    margin: 10px 0px;
+
     .el-table {
       font-size: 8px;
       cursor: pointer;
@@ -462,8 +390,44 @@ export default defineComponent({
     }
   }
 
-  .my-header {
-    font-size: 20px;
+  .comfirm {
+    height: 70px;
+    position: relative;
+    .file-folder {
+      float: right;
+      height: 30px;
+      width: 70%;
+      display: flex;
+      .title {
+        width: 50px;
+        line-height: 30px;
+        color: #7a7a7a;
+        font-weight: 600;
+        font-size: 12px;
+      }
+      .text-box {
+        width: calc(100% - 50px);
+        border: solid 1px #e4e7ed;
+        box-sizing: border-box;
+        border-radius: 4px;
+        background: #fcfcfd;
+        line-height: 30px;
+        padding-left: 10px;
+      }
+    }
+    .btn {
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+      .cancel {
+        box-sizing: border-box;
+        border: solid 1px #081c42;
+        color: #081c42;
+        &:hover {
+          background: #f5f6f8;
+        }
+      }
+    }
   }
 }
 </style>

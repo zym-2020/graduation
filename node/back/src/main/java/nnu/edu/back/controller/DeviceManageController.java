@@ -56,6 +56,11 @@ public class DeviceManageController {
         return ResultUtils.success(deviceManageService.getDeviceData(deviceId, jsonObject.getString("path")));
     }
 
+    @RequestMapping(value = "/getDeviceFolder", method = RequestMethod.POST)
+    public JsonResult getDeviceFolder(@RequestBody JSONObject jsonObject) {
+        return ResultUtils.success(deviceManageService.getDeviceFolder(jsonObject.getString("deviceId"), jsonObject.getString("path")));
+    }
+
     @RequestMapping(value = "/createFolder/{deviceId}", method = RequestMethod.POST)
     public JsonResult createFolder(@PathVariable String deviceId, @RequestBody JSONObject jsonObject) {
         return ResultUtils.success(deviceManageService.createFolder(deviceId, jsonObject.getString("path"), jsonObject.getString("folder")));

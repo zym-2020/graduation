@@ -35,7 +35,10 @@
               v-if="item.type === 'file' || item.type === 'path'"
             >
               <el-input disabled v-model="parameterList[index]" />
-              <el-button type="success" circle
+              <el-button
+                type="success"
+                circle
+                @click="fileAndPathClick(item.type, index)"
                 ><el-icon><FolderOpened /></el-icon
               ></el-button>
             </div>
@@ -49,6 +52,18 @@
         <el-button>确定</el-button>
       </div>
     </div>
+
+    <el-dialog v-model="paramSelectDialog" width="900" :append-to-body="true">
+      <!-- <template #header>
+        <div class="my-header"></div>
+      </template> -->
+      <param-select
+        :paramType="paramType"
+        @cancelCall="cancelCall"
+        @confirmCall="confirmCall"
+        v-if="paramSelectDialog"
+      />
+    </el-dialog>
   </div>
 </template>
 
@@ -56,6 +71,7 @@
 import { computed, defineComponent, onMounted, PropType, ref } from "vue";
 import { getScriptConfig } from "@/api/request";
 import { ScriptConfig } from "@/type";
+import ParamSelect from "./ParamSelect.vue";
 export default defineComponent({
   props: {
     scriptId: {
@@ -65,9 +81,13 @@ export default defineComponent({
       type: Object as PropType<Array<string>>,
     },
   },
+  components: { ParamSelect },
   setup(props) {
     const skeletonFlag = ref(true);
     const scriptConfig = ref<ScriptConfig>();
+    const paramSelectDialog = ref(false);
+    const paramType = ref("");
+    const paramIndex = ref(-1);
 
     const params = computed(() => {
       return scriptConfig.value?.parameters.parameterList;
@@ -83,14 +103,38 @@ export default defineComponent({
       }
     };
 
+    const fileAndPathClick = (type: string, index: number) => {
+      paramSelectDialog.value = true;
+      paramType.value = type;
+      paramIndex.value = index;
+    };
+
+    const cancelCall = () => {
+      paramSelectDialog.value = false;
+    };
+
+    const confirmCall = (val: { path: string[]; result: string }) => {
+      console.log(val);
+      paramSelectDialog.value = false;
+    };
+
     onMounted(async () => {
       skeletonFlag.value = true;
       await init();
       skeletonFlag.value = false;
-      console.log(props.parameterList, parameterList.value);
     });
 
-    return { skeletonFlag, scriptConfig, params, parameterList };
+    return {
+      skeletonFlag,
+      scriptConfig,
+      params,
+      parameterList,
+      paramSelectDialog,
+      paramType,
+      fileAndPathClick,
+      cancelCall,
+      confirmCall,
+    };
   },
 });
 </script>

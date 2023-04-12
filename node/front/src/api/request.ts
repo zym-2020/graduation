@@ -25,6 +25,13 @@ export const getDeviceData = async (
   return await post(`/device/getDeviceData/${deviceId}`, true, jsonDtaa);
 };
 
+export const getDeviceFolder = async (jsonData: {
+  deviceId: string;
+  path: string;
+}) => {
+  return await post(`/device/getDeviceFolder`, true, jsonData);
+};
+
 export const createFolder = async (
   deviceId: string,
   jsonData: { path: string; folder: string }
