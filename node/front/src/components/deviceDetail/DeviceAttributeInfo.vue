@@ -66,7 +66,7 @@
           </div>
           <div class="last-update">
             <strong>上次更新数据：</strong>
-            {{ dateFormat(textHandle(status.lastUpdate), "yyyy-MM-dd hh:mm") }}
+            {{ textHandle(status.lastUpdate, "yyyy-MM-dd hh:mm") }}
           </div>
           <div class="btn">
             <el-button
@@ -99,6 +99,7 @@ export default defineComponent({
   setup() {
     const imageUrl = computed(() => {
       if (
+        deviceConfig.value === undefined ||
         deviceConfig.value.deviceConfigAttribute.picture === null ||
         deviceConfig.value.deviceConfigAttribute.picture === "" ||
         deviceConfig.value.deviceConfigAttribute.picture === undefined
@@ -121,17 +122,16 @@ export default defineComponent({
     });
 
     const deviceConfig = computed(() => {
-      return router.currentRoute.value.params.device as unknown as DeviceConfig;
+      return router.currentRoute.value.params
+        ?.device as unknown as DeviceConfig;
     });
 
     const attribute = computed(() => {
-      return (
-        router.currentRoute.value.params.device as unknown as DeviceConfig
-      ).deviceConfigAttribute;
+      return deviceConfig.value.deviceConfigAttribute;
     });
 
     const status = computed(() => {
-      return router.currentRoute.value.params.device as unknown as {
+      return router.currentRoute.value.params.status as unknown as {
         state: number;
         lastUpdate: string;
       };
@@ -155,10 +155,17 @@ export default defineComponent({
 
     const activeName = ref("description");
 
-    const textHandle = (text: string | null | undefined) => {
+    const textHandle = (
+      text: string | null | undefined,
+      dateFormatStr?: string
+    ) => {
       if (text) {
         if (text != "") {
-          return text;
+          if (dateFormatStr) {
+            return dateFormat(text, dateFormatStr);
+          } else {
+            return text;
+          }
         } else {
           return "暂无信息";
         }
@@ -218,7 +225,6 @@ export default defineComponent({
       parameters,
       openClick,
       closeClick,
-      dateFormat,
     };
   },
 });

@@ -192,14 +192,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  nextTick,
-  onMounted,
-  PropType,
-  ref,
-} from "vue";
+import { computed, defineComponent, nextTick, ref } from "vue";
 import { dateFormat, formatFileSize } from "@/utils/common";
 import { TableDataType } from "@/type";
 import { getDeviceData, createFolder } from "@/api/request";
@@ -207,27 +200,22 @@ import { DeviceConfig } from "@/type";
 import router from "@/router";
 import AddFolder from "./AddFolder.vue";
 export default defineComponent({
-  props: {
-    dataList: {
-      type: Object as PropType<TableDataType[]>,
-    },
-    deviceConfig: {
-      type: Object as PropType<DeviceConfig>,
-    },
-  },
   components: { AddFolder },
-  setup(props) {
+  setup() {
     const tableHeight = ref(0);
     const contentComponent = ref<HTMLElement>();
     const path = ref<string[]>([]);
     const loading = ref(false);
-    const dataList = ref(props.dataList);
     const uploadFlag = ref(false);
-    const deviceConfig = computed(() => {
-      return props.deviceConfig;
-    });
-
     const addFolderVisual = ref(false);
+    const dataList = ref([
+      ...(router.currentRoute.value.params
+        .dataList as unknown as TableDataType[]),
+    ]);
+
+    const deviceConfig = computed(() => {
+      return router.currentRoute.value.params.device as unknown as DeviceConfig;
+    });
 
     const type = computed(() => {
       if (deviceConfig.value?.push) {

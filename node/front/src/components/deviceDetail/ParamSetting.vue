@@ -2,7 +2,6 @@
   <div class="param-setting">
     <el-skeleton :rows="5" animated v-if="skeletonFlag" />
     <div v-else>
-      <!-- <div class="des">{{ scriptConfig.description }}</div> -->
       <el-row>
         <el-col :span="4" class="title">参数名</el-col>
         <el-col :span="4" class="title">示例参数</el-col>
@@ -35,13 +34,13 @@
               class="file-path"
               v-if="item.type === 'file' || item.type === 'path'"
             >
-              <el-input disabled />
+              <el-input disabled v-model="parameterList[index]" />
               <el-button type="success" circle
                 ><el-icon><FolderOpened /></el-icon
               ></el-button>
             </div>
             <div class="input" v-if="item.type === 'input'">
-              <el-input />
+              <el-input v-model="parameterList[index]" />
             </div>
           </el-col>
         </el-row>
@@ -54,13 +53,16 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, PropType, ref } from "vue";
 import { getScriptConfig } from "@/api/request";
 import { ScriptConfig } from "@/type";
 export default defineComponent({
   props: {
     scriptId: {
       type: String,
+    },
+    parameterList: {
+      type: Object as PropType<Array<string>>,
     },
   },
   setup(props) {
@@ -70,6 +72,9 @@ export default defineComponent({
     const params = computed(() => {
       return scriptConfig.value?.parameters.parameterList;
     });
+    const parameterList = ref<string[] | undefined>(
+      props.parameterList ? props.parameterList : []
+    );
 
     const init = async () => {
       const res = await getScriptConfig(props.scriptId!);
@@ -82,9 +87,10 @@ export default defineComponent({
       skeletonFlag.value = true;
       await init();
       skeletonFlag.value = false;
+      console.log(props.parameterList, parameterList.value);
     });
 
-    return { skeletonFlag, scriptConfig, params };
+    return { skeletonFlag, scriptConfig, params, parameterList };
   },
 });
 </script>

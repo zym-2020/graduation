@@ -120,11 +120,14 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
         result.put("device", deviceConfig);
         Map<String, String> map = new HashMap<>();
-        for (Action action : deviceConfig.getActions().getActionList()) {
-            for (ActionStep step : action.getSteps()) {
-                map.put(step.getScript(), scriptMapper.getNameById(step.getScript()));
+        if (deviceConfig.getActions() != null && deviceConfig.getActions().getActionList() != null) {
+            for (Action action : deviceConfig.getActions().getActionList()) {
+                for (ActionStep step : action.getSteps()) {
+                    map.put(step.getScript(), scriptMapper.getNameById(step.getScript()));
+                }
             }
         }
+
         result.put("scriptMap", map);
         return result;
     }

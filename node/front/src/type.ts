@@ -94,8 +94,9 @@ export interface ScriptPojo {
 export interface Tree {
   id: string;
   label: string;
-  children?: Tree[];
   type: string;
+  children?: Tree[];
+  actionId?: string;
 }
 
 export interface TableDataType {
@@ -103,4 +104,8 @@ export interface TableDataType {
   lastUpdate: string;
   type: string;
   size?: number;
+}
+
+export interface DeviceDataDom {
+  initDataList: () => {};
 }

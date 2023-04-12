@@ -20,10 +20,12 @@
             <el-icon
               v-if="data.type === 'action'"
               class="plus-icon"
-              @click.prevent="addScript"
+              @click="addScript"
               ><CirclePlus
             /></el-icon>
-            <el-icon v-if="data.type === 'param'" @click="paramClick(data.id)"
+            <el-icon
+              v-if="data.type === 'param'"
+              @click="paramClick(data.id, data.actionId)"
               ><Switch
             /></el-icon>
             <el-icon v-else><CircleClose /></el-icon>
@@ -32,6 +34,13 @@
       </el-tree>
     </el-scrollbar>
 
+    <el-dialog v-model="scriptSettingDialog" width="800">
+      <template #header>
+        <div class="my-header">添加脚本</div>
+      </template>
+      <script-setting />
+    </el-dialog>
+
     <el-dialog v-model="paramSettingDialog" width="800">
       <template #header>
         <div class="my-header">
@@ -39,7 +48,11 @@
           参数配置
         </div>
       </template>
-      <param-setting :scriptId="scriptId" />
+      <param-setting
+        :scriptId="scriptId"
+        :parameterList="parameterList"
+        v-if="paramSettingDialog"
+      />
     </el-dialog>
   </div>
 </template>
@@ -48,6 +61,7 @@
 import { computed, defineComponent, PropType, ref } from "vue";
 import { Tree, DeviceActions } from "@/type";
 import router from "@/router";
+import ScriptSetting from "./ScriptSetting.vue";
 import ParamSetting from "./ParamSetting.vue";
 export default defineComponent({
   props: {
@@ -55,18 +69,21 @@ export default defineComponent({
       type: Object as PropType<DeviceActions>,
     },
   },
-  components: { ParamSetting },
+  components: { ParamSetting, ScriptSetting },
   setup(props) {
     const scriptMap = router.currentRoute.value.params.scriptMap as any;
     const defaultProps = {
       children: "children",
       label: "label",
     };
+    const scriptSettingDialog = ref(false);
     const paramSettingDialog = ref(false);
     const scriptId = ref("");
+
     const scriptName = computed(() => {
       return scriptMap[scriptId.value];
     });
+    const parameterList = ref<string[]>([]);
 
     const treeData = computed(() => {
       if (props.actions) {
@@ -76,13 +93,19 @@ export default defineComponent({
           item.steps.forEach((step) => {
             let paramArr: Tree[] = [];
             step.parameters.parameterList.forEach((param) => {
-              paramArr.push({ label: param, type: "param", id: step.script });
+              paramArr.push({
+                label: param,
+                type: "param",
+                id: step.script,
+                actionId: item.id,
+              });
             });
             stepArr.push({
               id: step.script,
               label: scriptMap[step.script],
               type: "script",
               children: paramArr,
+              actionId: item.id,
             });
           });
           data.push({
@@ -101,10 +124,24 @@ export default defineComponent({
       return height - (40 + 70 + 40) - (200 + 70 + 40 + 20);
     });
 
-    const addScript = () => {};
+    const addScript = () => {
+      scriptSettingDialog.value = true;
+    };
 
-    const paramClick = (id: string) => {
+    const paramClick = (id: string, actionId: string) => {
       scriptId.value = id;
+      for (let i = 0; i < props.actions!.actionList.length; i++) {
+        for (let j = 0; j < props.actions!.actionList[i].steps.length; j++) {
+          if (
+            actionId === props.actions!.actionList[i].id &&
+            id === props.actions!.actionList[i].steps[j].script
+          ) {
+            parameterList.value = [
+              ...props.actions!.actionList[i].steps[j].parameters.parameterList,
+            ];
+          }
+        }
+      }
       paramSettingDialog.value = true;
     };
 
@@ -112,9 +149,11 @@ export default defineComponent({
       defaultProps,
       treeData,
       maxHeight,
+      scriptSettingDialog,
       paramSettingDialog,
       scriptId,
       scriptName,
+      parameterList,
       addScript,
       paramClick,
     };

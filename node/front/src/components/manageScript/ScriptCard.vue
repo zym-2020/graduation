@@ -21,9 +21,11 @@
           <img src="/script-color.png" />
         </div>
         <div class="content">
-          <div class="title">{{ scriptPojo.name }}</div>
+          <div class="title">
+            <span v-html="replaceHandle(scriptPojo.name)" />
+          </div>
           <div class="description">
-            {{ scriptPojo.description }}
+            <span v-html="replaceHandle(scriptPojo.description)" />
           </div>
         </div>
       </div>
@@ -45,6 +47,9 @@ import ScriptInfo from "./ScriptInfo.vue";
 import { notice } from "@/utils/common";
 export default defineComponent({
   props: {
+    keyword: {
+      type: String,
+    },
     cardType: {
       type: String,
     },
@@ -77,6 +82,15 @@ export default defineComponent({
       }
     };
 
+    const replaceHandle = (currentStr: string) => {
+      const res = new RegExp("(" + props.keyword + ")", "g");
+      currentStr = currentStr.replace(
+        res,
+        "<span style='color:red;'>" + props.keyword + "</span>"
+      );
+      return currentStr;
+    };
+
     return {
       action,
       cardType,
@@ -84,6 +98,7 @@ export default defineComponent({
       scriptInfoDialog,
       detailClick,
       successHandle,
+      replaceHandle,
     };
   },
 });

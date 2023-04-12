@@ -40,7 +40,7 @@ public class ScriptManageServiceImpl implements ScriptManageService {
 
     @Override
     public Map<String, Object> pageQuery(int size, int page, String keyword) {
-        if (keyword.equals("")) {
+        if (!keyword.equals("")) {
             keyword = "%" + keyword + "%";
         }
         List<Script> scriptList = scriptMapper.pageQuery(size, size * page, keyword);

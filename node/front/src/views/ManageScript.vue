@@ -2,31 +2,37 @@
   <div class="manage-script" ref="scriptComponent">
     <div class="search">
       <el-input v-model="input" placeholder="请输入关键字" />
-      <el-button
+      <el-button @click="searchClick"
         ><el-icon><Search /></el-icon>检索</el-button
       >
     </div>
-    <el-row :gutter="20">
-      <el-col :span="6">
-        <script-card :cardType="'add'" @refresh="refresh" />
-      </el-col>
-      <el-col :span="6" v-for="(item, index) in scriptList" :key="index">
-        <script-card
-          :cardType="'script'"
-          :scriptPojo="item"
-          @scriptCardCall="scriptCardCall"
+    <el-skeleton :rows="5" animated v-if="skeletonFlag" />
+    <div v-else>
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <script-card :cardType="'add'" @refresh="refresh" />
+        </el-col>
+        <el-col :span="6" v-for="(item, index) in scriptList" :key="index">
+          <script-card
+            :keyword="keyword"
+            :cardType="'script'"
+            :scriptPojo="item"
+            @scriptCardCall="scriptCardCall"
+          />
+        </el-col>
+      </el-row>
+      <div class="page">
+        <el-pagination
+          small
+          background
+          layout="total, prev, pager, next"
+          :total="total"
+          :pager-count="5"
+          :hide-on-single-page="true"
+          v-model:current-page="currentPage"
+          @current-change="pageChange"
         />
-      </el-col>
-    </el-row>
-    <div class="page">
-      <el-pagination
-        small
-        background
-        layout="total, prev, pager, next"
-        :total="total"
-        :pager-count="5"
-        :hide-on-single-page="true"
-      />
+      </div>
     </div>
 
     <el-dialog v-model="scriptInfoDialog" width="800">
@@ -53,11 +59,14 @@ import { notice } from "@/utils/common";
 export default defineComponent({
   components: { ScriptCard, ScriptInfo },
   setup() {
+    const skeletonFlag = ref(true);
     const input = ref("");
     const scriptComponent = ref<HTMLElement>();
     const scriptList = ref<ScriptPojo[]>([]);
-    const keyword = "";
+    const keyword = ref("");
     const total = ref(0);
+    const currentPage = ref(1);
+
     const scriptInfoDialog = ref(false);
     const scriptConfig = ref<ScriptConfig>();
 
@@ -71,16 +80,18 @@ export default defineComponent({
       }
     });
 
-    const init = async () => {
+    const queryScriptList = async (page: number) => {
+      skeletonFlag.value = true;
       const res = await pageQuery({
         size: size.value,
-        page: 0,
-        keyword: keyword,
+        page: page,
+        keyword: keyword.value,
       });
       if (res) {
         scriptList.value = res.data.list;
         total.value = res.data.total;
       }
+      skeletonFlag.value = false;
     };
 
     const scriptCardCall = async (val: string) => {
@@ -92,24 +103,40 @@ export default defineComponent({
     };
 
     const refresh = async () => {
-      await init();
+      await queryScriptList(0);
       notice("success", "成功", "添加成功");
     };
 
-    onMounted(() => {
-      init();
+    const pageChange = async (val: number) => {
+      await queryScriptList(val - 1);
+      input.value = keyword.value;
+    };
+
+    const searchClick = async () => {
+      keyword.value = input.value;
+      await queryScriptList(0);
+      currentPage.value = 1;
+    };
+
+    onMounted(async () => {
+      await queryScriptList(0);
     });
 
     return {
       input,
+      keyword,
       scriptComponent,
       size,
       scriptList,
       total,
       scriptInfoDialog,
       scriptConfig,
+      skeletonFlag,
+      currentPage,
       scriptCardCall,
       refresh,
+      pageChange,
+      searchClick,
     };
   },
 });

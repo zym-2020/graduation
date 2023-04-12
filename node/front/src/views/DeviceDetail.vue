@@ -3,42 +3,20 @@
     <el-scrollbar>
       <div class="content">
         <device-attribute-info />
-        <device-data :dataList="dataList" :deviceConfig="deviceConfig" />
+        <device-data />
       </div>
     </el-scrollbar>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent } from "vue";
 import DeviceAttributeInfo from "@/components/deviceDetail/DeviceAttributeInfo.vue";
 import DeviceData from "@/components/deviceDetail/DeviceData.vue";
-import router from "@/router";
-import { DeviceConfig, TableDataType } from "@/type";
+
 export default defineComponent({
   components: { DeviceAttributeInfo, DeviceData },
-  setup() {
-    const deviceConfig = ref<DeviceConfig>(
-      router.currentRoute.value.params.device as unknown as DeviceConfig
-    );
-
-    const dataList = ref<TableDataType[]>(
-      router.currentRoute.value.params.dataList as unknown as TableDataType[]
-    );
-
-    const status = ref<{ state: number; lastUpdate: string }>(
-      router.currentRoute.value.params.status as unknown as {
-        state: number;
-        lastUpdate: string;
-      }
-    );
-
-    return {
-      deviceConfig,
-      status,
-      dataList,
-    };
-  },
+  setup() {},
 });
 </script>
 
