@@ -5,7 +5,7 @@
         <el-icon><ArrowLeftBold /></el-icon>
       </div>
       <div class="path-name">
-        <svg fill="currentcolor" viewBox="0 0 256 256">
+        <svg fill="currentcolor" viewBox="0 0 256 256" @click="pathClick">
           <g>
             <path
               d="M23.4,121.5c-11.5,0-21.4,9.8-21.4,21.2c0.2,11.8,9.7,21.2,21.4,21.4 c11.4,0,21.2-9.9,21.2-21.4C44.3,131.1,35,121.7,23.4,121.5"
@@ -150,6 +150,20 @@
       </div>
       <div class="btn">
         <el-button
+          type="success"
+          v-if="actionFlag && paramType === 'file'"
+          @click="realTimeClick"
+        >
+          <el-tooltip
+            effect="dark"
+            content="将接收到的实时数据作为参数传入"
+            placement="top"
+          >
+            <el-icon><InfoFilled /></el-icon>
+          </el-tooltip>
+          实时参数传入</el-button
+        >
+        <el-button
           color="#081c42"
           :disabled="disabledFlag"
           @click="comfirmClick"
@@ -172,6 +186,9 @@ export default defineComponent({
     paramType: {
       type: String,
     },
+    actionFlag: {
+      type: Boolean,
+    },
   },
   emits: ["cancelCall", "confirmCall"],
   setup(props, context) {
@@ -185,6 +202,10 @@ export default defineComponent({
     });
     const paramType = computed(() => {
       return props.paramType;
+    });
+    const actionFlag = computed(() => {
+      if (props.actionFlag) return props.actionFlag;
+      else return false;
     });
 
     const rowClickHandle = (row: TableDataType) => {
@@ -244,7 +265,7 @@ export default defineComponent({
             path.value.splice(path.value.length - 1, 1);
             loading.value = false;
             result.value =
-              path.value.length > 0 ? path.value[path.value.length - 1] : "";
+              path.value.length > 0 ? path.value[path.value.length - 1] : "/";
           }
         } else {
           const res = await getDeviceData(id, { path: p });
@@ -258,12 +279,44 @@ export default defineComponent({
       }
     };
 
+    const pathClick = async () => {
+      loading.value = true;
+      await init();
+      loading.value = false;
+      path.value = [];
+      if (paramType.value === "path") {
+        result.value = "/";
+      } else {
+        result.value = "";
+      }
+    };
+
     const cancelClick = () => {
       context.emit("cancelCall");
     };
 
     const comfirmClick = () => {
-      context.emit("confirmCall", { path: path.value, result: result.value });
+      if (paramType.value === "path") {
+        if (dataList.value.length === 0) {
+          const temp = [...path.value];
+          temp.splice(temp.length - 1, 1);
+          context.emit("confirmCall", {
+            path: temp,
+            result: result.value,
+          });
+        } else {
+          context.emit("confirmCall", {
+            path: path.value,
+            result: result.value,
+          });
+        }
+      } else {
+        context.emit("confirmCall", { path: path.value, result: result.value });
+      }
+    };
+
+    const realTimeClick = () => {
+      context.emit("confirmCall", { path: [], result: "#{data}" });
     };
 
     const formatSize = (type: "file" | "folder", size: number) => {
@@ -275,7 +328,6 @@ export default defineComponent({
     };
 
     const init = async () => {
-      skeletonFlag.value = true;
       if (paramType.value === "path") {
         const res = await getDeviceFolder({
           deviceId: router.currentRoute.value.params.id as string,
@@ -293,11 +345,15 @@ export default defineComponent({
           dataList.value = res.data;
         }
       }
-      skeletonFlag.value = false;
     };
 
     onMounted(async () => {
+      skeletonFlag.value = true;
       await init();
+      skeletonFlag.value = false;
+      if (paramType.value === "path") {
+        result.value = "/";
+      }
     });
 
     return {
@@ -308,6 +364,7 @@ export default defineComponent({
       paramType,
       result,
       disabledFlag,
+      actionFlag,
       formatSize,
       dateFormat,
       rowDblclickHandle,
@@ -315,6 +372,8 @@ export default defineComponent({
       backClick,
       cancelClick,
       comfirmClick,
+      realTimeClick,
+      pathClick,
     };
   },
 });
@@ -426,6 +485,9 @@ export default defineComponent({
         &:hover {
           background: #f5f6f8;
         }
+      }
+      .el-icon {
+        margin-right: 5px;
       }
     }
   }

@@ -39,6 +39,15 @@ export const createFolder = async (
   return await post(`/device/createFolder/${deviceId}`, true, jsonData);
 };
 
+export const updateActionParameter = async (jsonData: {
+  deviceId: string;
+  actionId: string;
+  stepId: string;
+  parameters: string[];
+}) => {
+  return await post(`/device/updateActionParameter`, true, jsonData);
+};
+
 //receiveRealTimeData相关接口
 export const checkPort = async (port: number) => {
   return await get(`/receiveRealTimeData/checkPort/${port}`, true);

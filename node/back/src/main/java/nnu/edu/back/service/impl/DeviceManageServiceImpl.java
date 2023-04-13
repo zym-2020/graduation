@@ -204,4 +204,30 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         }
 
     }
+
+    @Override
+    public DeviceConfig updateActionParameter(String deviceId, String actionId, String stepId, List<String> parameters) {
+        String configAddress = configPath + deviceId + ".xml";
+        File file = new File(configAddress);
+        DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
+        List<Action> actionList = deviceConfig.getActions().getActionList();
+        for (Action action : actionList) {
+            if (action.getId().equals(actionId)) {
+                List<ActionStep> steps = action.getSteps();
+                for (ActionStep step : steps) {
+                    if (step.getId().equals(stepId)) {
+                        step.getParameters().setParameterList(parameters);
+                        String content = XmlUtil.toXml(deviceConfig);
+                        try {
+                            FileUtil.writeFile(configAddress, content);
+                            return deviceConfig;
+                        } catch (Exception e) {
+                            throw new MyException(ResultEnum.DEFAULT_EXCEPTION);
+                        }
+                    }
+                }
+            }
+        }
+        throw new MyException(ResultEnum.NO_OBJECT);
+    }
 }

@@ -23,6 +23,7 @@ export interface DeviceActions {
     id: string;
     name: string;
     steps: {
+      id: string;
       script: string;
       parameters: {
         parameterList: string[];

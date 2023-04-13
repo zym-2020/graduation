@@ -4,7 +4,10 @@
       <el-button type="success" plain size="small">添加行为</el-button>
     </div>
     <el-scrollbar :max-height="maxHeight">
-      <el-tree :data="treeData" :props="defaultProps">
+      <el-tree
+        :data="treeData"
+        :props="defaultProps"
+      >
         <template #default="{ node, data }">
           <span class="custom-tree-node">
             <svg class="icon-svg" v-if="data.type === 'action'">
@@ -51,7 +54,9 @@
       <param-setting
         :scriptId="scriptId"
         :parameterList="parameterList"
+        :actionFlag="true"
         v-if="paramSettingDialog"
+        @paramSettingCall="paramSettingCall"
       />
     </el-dialog>
   </div>
@@ -63,14 +68,19 @@ import { Tree, DeviceActions } from "@/type";
 import router from "@/router";
 import ScriptSetting from "./ScriptSetting.vue";
 import ParamSetting from "./ParamSetting.vue";
+import { updateActionParameter } from "@/api/request";
+import { notice } from "@/utils/common";
 export default defineComponent({
   props: {
     actions: {
       type: Object as PropType<DeviceActions>,
     },
   },
+  emits: ["deviceActionCall"],
   components: { ParamSetting, ScriptSetting },
-  setup(props) {
+  setup(props, context) {
+    let actionId = "";
+    let stepId = "";
     const scriptMap = router.currentRoute.value.params.scriptMap as any;
     const defaultProps = {
       children: "children",
@@ -79,11 +89,11 @@ export default defineComponent({
     const scriptSettingDialog = ref(false);
     const paramSettingDialog = ref(false);
     const scriptId = ref("");
+    const parameterList = ref<string[]>([]);
 
     const scriptName = computed(() => {
       return scriptMap[scriptId.value];
     });
-    const parameterList = ref<string[]>([]);
 
     const treeData = computed(() => {
       if (props.actions) {
@@ -96,12 +106,12 @@ export default defineComponent({
               paramArr.push({
                 label: param,
                 type: "param",
-                id: step.script,
+                id: step.id,
                 actionId: item.id,
               });
             });
             stepArr.push({
-              id: step.script,
+              id: step.id,
               label: scriptMap[step.script],
               type: "script",
               children: paramArr,
@@ -128,21 +138,38 @@ export default defineComponent({
       scriptSettingDialog.value = true;
     };
 
-    const paramClick = (id: string, actionId: string) => {
-      scriptId.value = id;
+    const paramClick = (id: string, actionIdParam: string) => {
       for (let i = 0; i < props.actions!.actionList.length; i++) {
         for (let j = 0; j < props.actions!.actionList[i].steps.length; j++) {
           if (
-            actionId === props.actions!.actionList[i].id &&
-            id === props.actions!.actionList[i].steps[j].script
+            actionIdParam === props.actions!.actionList[i].id &&
+            id === props.actions!.actionList[i].steps[j].id
           ) {
+            scriptId.value = props.actions!.actionList[i].steps[j].script;
             parameterList.value = [
               ...props.actions!.actionList[i].steps[j].parameters.parameterList,
             ];
           }
         }
       }
+      actionId = actionIdParam;
+      stepId = id;
       paramSettingDialog.value = true;
+    };
+
+    const paramSettingCall = async (val: string[]) => {
+      const deviceId = router.currentRoute.value.params.id as string;
+      const res = await updateActionParameter({
+        deviceId: deviceId,
+        actionId: actionId,
+        stepId: stepId,
+        parameters: val,
+      });
+      if (res) {
+        context.emit("deviceActionCall", res.data);
+        notice("success", "成功", "参数修改成功");
+      }
+      paramSettingDialog.value = false;
     };
 
     return {
@@ -156,6 +183,7 @@ export default defineComponent({
       parameterList,
       addScript,
       paramClick,
+      paramSettingCall,
     };
   },
 });

@@ -49,16 +49,22 @@
         </el-row>
       </div>
       <div class="btn">
-        <el-button>确定</el-button>
+        <el-button @click="confirmClick" :disabled="disabledFlag"
+          >确定</el-button
+        >
       </div>
     </div>
 
     <el-dialog v-model="paramSelectDialog" width="900" :append-to-body="true">
-      <!-- <template #header>
-        <div class="my-header"></div>
-      </template> -->
+      <template #header>
+        <div class="my-header">
+          <span>{{ scriptConfig.name }}</span
+          >&nbsp;参数选择
+        </div>
+      </template>
       <param-select
         :paramType="paramType"
+        :actionFlag="actionFlag"
         @cancelCall="cancelCall"
         @confirmCall="confirmCall"
         v-if="paramSelectDialog"
@@ -80,26 +86,52 @@ export default defineComponent({
     parameterList: {
       type: Object as PropType<Array<string>>,
     },
+    actionFlag: {
+      type: Boolean,
+    },
   },
+  emits: ["paramSettingCall"],
   components: { ParamSelect },
-  setup(props) {
+  setup(props, context) {
     const skeletonFlag = ref(true);
     const scriptConfig = ref<ScriptConfig>();
     const paramSelectDialog = ref(false);
     const paramType = ref("");
     const paramIndex = ref(-1);
+    const parameterList = ref<string[]>([]);
 
     const params = computed(() => {
-      return scriptConfig.value?.parameters.parameterList;
+      if (scriptConfig.value) {
+        return scriptConfig.value.parameters.parameterList;
+      } else {
+        return [];
+      }
     });
-    const parameterList = ref<string[] | undefined>(
-      props.parameterList ? props.parameterList : []
-    );
+
+    const actionFlag = computed(() => {
+      if (actionFlag) return props.actionFlag;
+      else return false;
+    });
+
+    const disabledFlag = computed(() => {
+      for (let i = 0; i < parameterList.value.length; i++) {
+        if (parameterList.value[i] === "") return true;
+      }
+      return false;
+    });
 
     const init = async () => {
+      if (props.parameterList) {
+        parameterList.value = props.parameterList;
+      }
       const res = await getScriptConfig(props.scriptId!);
       if (res) {
         scriptConfig.value = res.data;
+        if (!props.parameterList) {
+          parameterList.value = new Array(
+            scriptConfig.value?.parameters.parameterList.length
+          ).fill("");
+        }
       }
     };
 
@@ -114,8 +146,21 @@ export default defineComponent({
     };
 
     const confirmCall = (val: { path: string[]; result: string }) => {
-      console.log(val);
+      if (val.path.length === 0) {
+        parameterList.value[paramIndex.value] = val.result;
+      } else {
+        let p = "";
+        val.path.forEach((item) => {
+          p += item + "/";
+        });
+        p += val.result;
+        parameterList.value[paramIndex.value] = p;
+      }
       paramSelectDialog.value = false;
+    };
+
+    const confirmClick = () => {
+      context.emit("paramSettingCall", parameterList.value);
     };
 
     onMounted(async () => {
@@ -131,9 +176,12 @@ export default defineComponent({
       parameterList,
       paramSelectDialog,
       paramType,
+      actionFlag,
+      disabledFlag,
       fileAndPathClick,
       cancelCall,
       confirmCall,
+      confirmClick,
     };
   },
 });
@@ -201,6 +249,13 @@ export default defineComponent({
         background: #f5f6f8;
       }
     }
+  }
+}
+.my-header {
+  font-size: 20px;
+  color: #969696;
+  span {
+    color: black;
   }
 }
 </style>

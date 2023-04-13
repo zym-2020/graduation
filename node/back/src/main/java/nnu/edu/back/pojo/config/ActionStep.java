@@ -1,6 +1,7 @@
 package nnu.edu.back.pojo.config;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ActionStep {
+    @XStreamAsAttribute
+    String id;
     String script;
 
     @XStreamAlias("parameters")

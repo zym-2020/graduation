@@ -15,7 +15,7 @@
             <div class="script-des">
               <span v-html="replaceHandle(item.description)" />
             </div>
-            <param-setting :scriptId="item.id" />
+            <param-setting :scriptId="item.id" :actionFlag="true" />
           </div>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default defineComponent({
       keyword = input.value;
       await queryScriptList(0);
       currentPage.value = 1;
-      currentScriptId.value = ""
+      currentScriptId.value = "";
     };
 
     const replaceHandle = (currentStr: string) => {

@@ -37,7 +37,10 @@
         </el-tab-pane>
         <el-tab-pane label="设备行为" name="action">
           <div class="action">
-            <device-action :actions="deviceConfig.actions"></device-action>
+            <device-action
+              :actions="deviceConfig.actions"
+              @deviceActionCall="deviceActionCall"
+            ></device-action>
           </div>
         </el-tab-pane>
         <el-tab-pane label="设备状态" name="state">
@@ -86,71 +89,69 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from "vue";
+import { computed, defineComponent, PropType, ref, watch } from "vue";
 import { DeviceConfig } from "@/type";
 import { imgBase64, notice, dateFormat } from "@/utils/common";
 import { prefix } from "@/prefix";
 import { startTCPServer, stopTCPServer } from "@/api/request";
 import DeviceAction from "./DeviceAction.vue";
-import router from "@/router";
 export default defineComponent({
   components: { DeviceAction },
-
-  setup() {
+  props: {
+    deviceConfig: {
+      type: Object as PropType<DeviceConfig>,
+    },
+    status: {
+      type: Object as PropType<{
+        state: number;
+        lastUpdate: string;
+      }>,
+    },
+  },
+  setup(props) {
+    const status = ref(props.status);
+    const deviceConfig = ref<DeviceConfig>(props.deviceConfig!);
     const imageUrl = computed(() => {
       if (
-        deviceConfig.value === undefined ||
-        deviceConfig.value.deviceConfigAttribute.picture === null ||
-        deviceConfig.value.deviceConfigAttribute.picture === "" ||
-        deviceConfig.value.deviceConfigAttribute.picture === undefined
+        props.deviceConfig?.deviceConfigAttribute.picture === null ||
+        props.deviceConfig?.deviceConfigAttribute.picture === "" ||
+        props.deviceConfig?.deviceConfigAttribute.picture === undefined
       ) {
         if (
-          deviceConfig.value.deviceConfigAttribute.name === null ||
-          deviceConfig.value.deviceConfigAttribute.name === "" ||
-          deviceConfig.value.deviceConfigAttribute.name === undefined
+          props.deviceConfig?.deviceConfigAttribute.name === null ||
+          props.deviceConfig?.deviceConfigAttribute.name === "" ||
+          props.deviceConfig?.deviceConfigAttribute.name === undefined
         ) {
           return imgBase64("device");
         } else {
-          return imgBase64(deviceConfig.value.deviceConfigAttribute.name);
+          return imgBase64(props.deviceConfig?.deviceConfigAttribute.name);
         }
       } else {
         return (
           prefix +
-          `device/getPicture/${deviceConfig.value.deviceConfigAttribute.picture}`
+          `device/getPicture/${props.deviceConfig?.deviceConfigAttribute.picture}`
         );
       }
     });
 
-    const deviceConfig = computed(() => {
-      return router.currentRoute.value.params
-        ?.device as unknown as DeviceConfig;
-    });
-
     const attribute = computed(() => {
-      return deviceConfig.value.deviceConfigAttribute;
-    });
-
-    const status = computed(() => {
-      return router.currentRoute.value.params.status as unknown as {
-        state: number;
-        lastUpdate: string;
-      };
+      return props.deviceConfig?.deviceConfigAttribute;
     });
 
     const type = computed(() => {
-      if (deviceConfig.value.push) {
+      if (props.deviceConfig?.push) {
         return ["主动推送", ""];
-      } else if (deviceConfig.value.typing) {
+      } else if (props.deviceConfig?.typing) {
         return ["手动录入", "success"];
       }
     });
 
     const protocol = computed(() => {
-      return deviceConfig.value.push?.protocol;
+      return props.deviceConfig?.push?.protocol;
     });
 
     const port = computed(() => {
-      return deviceConfig.value.push?.port;
+      return props.deviceConfig?.push?.port;
     });
 
     const activeName = ref("description");
@@ -193,6 +194,7 @@ export default defineComponent({
           );
           if (res) {
             notice("success", "成功", "启动成功");
+            status.value!.state = 1;
           }
         }
       }
@@ -207,9 +209,14 @@ export default defineComponent({
           );
           if (res) {
             notice("success", "成功", "关闭监听");
+            status.value!.state = -1;
           }
         }
       }
+    };
+
+    const deviceActionCall = (val: DeviceConfig) => {
+      deviceConfig.value = val;
     };
 
     return {
@@ -225,6 +232,7 @@ export default defineComponent({
       parameters,
       openClick,
       closeClick,
+      deviceActionCall,
     };
   },
 });

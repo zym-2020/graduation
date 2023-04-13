@@ -38,7 +38,8 @@ public class ScriptUtil {
                 FileUtil.writeFile(tempPath + uuid + ".txt", data);
                 res.add(tempPath + uuid + ".txt");
             } else if (scriptParameters.getParameterList().get(i).getType().equals("path") || scriptParameters.getParameterList().get(i).getType().equals("file")) {
-                res.add(basePath + deviceId + "/" + actionParameters.getParameterList().get(i));
+                String path = actionParameters.getParameterList().get(i).equals("/") ? "" : "/" + actionParameters.getParameterList().get(i);
+                res.add(basePath + deviceId + path);
             } else if (scriptParameters.getParameterList().get(i).getType().equals("input")) {
                 res.add(actionParameters.getParameterList().get(i));
             }

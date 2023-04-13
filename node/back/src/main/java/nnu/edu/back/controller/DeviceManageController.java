@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -64,5 +65,14 @@ public class DeviceManageController {
     @RequestMapping(value = "/createFolder/{deviceId}", method = RequestMethod.POST)
     public JsonResult createFolder(@PathVariable String deviceId, @RequestBody JSONObject jsonObject) {
         return ResultUtils.success(deviceManageService.createFolder(deviceId, jsonObject.getString("path"), jsonObject.getString("folder")));
+    }
+
+    @RequestMapping(value = "/updateActionParameter", method = RequestMethod.POST)
+    public JsonResult updateActionParameter(@RequestBody JSONObject jsonObject) {
+        String deviceId = jsonObject.getString("deviceId");
+        String actionId = jsonObject.getString("actionId");
+        String stepId = jsonObject.getString("stepId");
+        List<String> parameters = jsonObject.getList("parameters", String.class);
+        return ResultUtils.success(deviceManageService.updateActionParameter(deviceId, actionId, stepId, parameters));
     }
 }
