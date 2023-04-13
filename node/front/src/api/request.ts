@@ -48,6 +48,15 @@ export const updateActionParameter = async (jsonData: {
   return await post(`/device/updateActionParameter`, true, jsonData);
 };
 
+export const addStep = async (jsonData: {
+  deviceId: string;
+  actionId: string;
+  scriptId: string;
+  parameters: string[];
+}) => {
+  return await post(`/device/addStep`, true, jsonData);
+};
+
 //receiveRealTimeData相关接口
 export const checkPort = async (port: number) => {
   return await get(`/receiveRealTimeData/checkPort/${port}`, true);

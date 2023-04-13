@@ -4,10 +4,7 @@
       <el-button type="success" plain size="small">添加行为</el-button>
     </div>
     <el-scrollbar :max-height="maxHeight">
-      <el-tree
-        :data="treeData"
-        :props="defaultProps"
-      >
+      <el-tree :data="treeData" :props="defaultProps">
         <template #default="{ node, data }">
           <span class="custom-tree-node">
             <svg class="icon-svg" v-if="data.type === 'action'">
@@ -23,7 +20,7 @@
             <el-icon
               v-if="data.type === 'action'"
               class="plus-icon"
-              @click="addScript"
+              @click="addScript(data.id)"
               ><CirclePlus
             /></el-icon>
             <el-icon
@@ -41,7 +38,7 @@
       <template #header>
         <div class="my-header">添加脚本</div>
       </template>
-      <script-setting />
+      <script-setting @scriptSettingCall="scriptSettingCall" />
     </el-dialog>
 
     <el-dialog v-model="paramSettingDialog" width="800">
@@ -68,7 +65,7 @@ import { Tree, DeviceActions } from "@/type";
 import router from "@/router";
 import ScriptSetting from "./ScriptSetting.vue";
 import ParamSetting from "./ParamSetting.vue";
-import { updateActionParameter } from "@/api/request";
+import { updateActionParameter, addStep } from "@/api/request";
 import { notice } from "@/utils/common";
 export default defineComponent({
   props: {
@@ -134,8 +131,9 @@ export default defineComponent({
       return height - (40 + 70 + 40) - (200 + 70 + 40 + 20);
     });
 
-    const addScript = () => {
+    const addScript = (actionIdParam: string) => {
       scriptSettingDialog.value = true;
+      actionId = actionIdParam;
     };
 
     const paramClick = (id: string, actionIdParam: string) => {
@@ -172,6 +170,24 @@ export default defineComponent({
       paramSettingDialog.value = false;
     };
 
+    const scriptSettingCall = async (val: {
+      parameters: string[];
+      scriptId: string;
+    }) => {
+      const deviceId = router.currentRoute.value.params.id as string;
+      const res = await addStep({
+        deviceId: deviceId,
+        actionId: actionId,
+        scriptId: val.scriptId,
+        parameters: val.parameters,
+      });
+      if (res) {
+        context.emit("deviceActionCall", res.data);
+        notice("success", "成功", "增加脚本");
+      }
+      scriptSettingDialog.value = false;
+    };
+
     return {
       defaultProps,
       treeData,
@@ -184,6 +200,7 @@ export default defineComponent({
       addScript,
       paramClick,
       paramSettingCall,
+      scriptSettingCall,
     };
   },
 });

@@ -33,4 +33,6 @@ public interface DeviceManageService {
     List<Map<String, Object>> createFolder(String deviceId, String path, String folder);
 
     DeviceConfig updateActionParameter(String deviceId, String actionId, String stepId, List<String> parameters);
+
+    DeviceConfig addStep(String deviceId, String actionId, String scriptId, List<String> parameters);
 }

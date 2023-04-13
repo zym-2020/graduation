@@ -230,4 +230,28 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         }
         throw new MyException(ResultEnum.NO_OBJECT);
     }
+
+    @Override
+    public DeviceConfig addStep(String deviceId, String actionId, String scriptId, List<String> parameters) {
+        String configAddress = configPath + deviceId + ".xml";
+        File file = new File(configAddress);
+        DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
+        List<Action> actionList = deviceConfig.getActions().getActionList();
+        for (int i = 0; i < actionList.size(); i++) {
+            Action action = actionList.get(i);
+            if (action.getId().equals(actionId)) {
+                ActionStep step = new ActionStep(UUID.randomUUID().toString(), scriptId, new ActionParameters(parameters));
+                action.getSteps().add(step);
+                String content = XmlUtil.toXml(deviceConfig);
+                try {
+                    FileUtil.writeFile(configAddress, content);
+                    return deviceConfig;
+                } catch (Exception e) {
+                    throw new MyException(ResultEnum.DEFAULT_EXCEPTION);
+                }
+            }
+        }
+
+        throw new MyException(ResultEnum.NO_OBJECT);
+    }
 }

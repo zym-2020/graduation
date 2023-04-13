@@ -15,7 +15,11 @@
             <div class="script-des">
               <span v-html="replaceHandle(item.description)" />
             </div>
-            <param-setting :scriptId="item.id" :actionFlag="true" />
+            <param-setting
+              :scriptId="item.id"
+              :actionFlag="true"
+              @paramSettingCall="paramSettingCall"
+            />
           </div>
         </div>
       </div>
@@ -43,7 +47,8 @@ import { pageQuery } from "@/api/request";
 import { ScriptPojo } from "@/type";
 export default defineComponent({
   components: { ParamSetting },
-  setup() {
+  emits: ["scriptSettingCall"],
+  setup(_, context) {
     let keyword = "";
     const input = ref("");
     const currentScriptId = ref("");
@@ -89,6 +94,14 @@ export default defineComponent({
       return currentStr;
     };
 
+    const paramSettingCall = (val: string[]) => {
+      console.log(val);
+      context.emit("scriptSettingCall", {
+        parameters: val,
+        scriptId: currentScriptId.value,
+      });
+    };
+
     onMounted(async () => {
       await queryScriptList(0);
     });
@@ -104,6 +117,7 @@ export default defineComponent({
       pageChange,
       searchClick,
       replaceHandle,
+      paramSettingCall,
     };
   },
 });
