@@ -119,16 +119,7 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         }
         DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
         result.put("device", deviceConfig);
-        Map<String, String> map = new HashMap<>();
-        if (deviceConfig.getActions() != null && deviceConfig.getActions().getActionList() != null) {
-            for (Action action : deviceConfig.getActions().getActionList()) {
-                for (ActionStep step : action.getSteps()) {
-                    map.put(step.getScript(), scriptMapper.getNameById(step.getScript()));
-                }
-            }
-        }
 
-        result.put("scriptMap", map);
         return result;
     }
 
@@ -240,8 +231,15 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         for (int i = 0; i < actionList.size(); i++) {
             Action action = actionList.get(i);
             if (action.getId().equals(actionId)) {
-                ActionStep step = new ActionStep(UUID.randomUUID().toString(), scriptId, new ActionParameters(parameters));
-                action.getSteps().add(step);
+                String scriptName = scriptMapper.getNameById(scriptId);
+                ActionStep step = new ActionStep(UUID.randomUUID().toString(), scriptId, scriptName, new ActionParameters(parameters));
+                if (action.getSteps() == null) {
+                    List<ActionStep> steps = new ArrayList<>();
+                    steps.add(step);
+                    action.setSteps(steps);
+                } else {
+                    action.getSteps().add(step);
+                }
                 String content = XmlUtil.toXml(deviceConfig);
                 try {
                     FileUtil.writeFile(configAddress, content);
@@ -253,5 +251,70 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         }
 
         throw new MyException(ResultEnum.NO_OBJECT);
+    }
+
+    @Override
+    public DeviceConfig deleteAction(String deviceId, String id, String type) {
+        String configAddress = configPath + deviceId + ".xml";
+        File file = new File(configAddress);
+        DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
+        List<Action> actionList = deviceConfig.getActions().getActionList();
+        for (Action action : actionList) {
+            if (type.equals("action")) {
+                if (action.getId().equals(id)) {
+                    actionList.remove(action);
+                    String content = XmlUtil.toXml(deviceConfig);
+                    try {
+                        FileUtil.writeFile(configAddress, content);
+                        return deviceConfig;
+                    } catch (Exception e) {
+                        throw new MyException(ResultEnum.DEFAULT_EXCEPTION);
+                    }
+                }
+            } else if (type.equals("script")) {
+                List<ActionStep> steps = action.getSteps();
+                for (ActionStep step : steps) {
+                    if (step.getId().equals(id)) {
+                        steps.remove(step);
+                        String content = XmlUtil.toXml(deviceConfig);
+                        try {
+                            FileUtil.writeFile(configAddress, content);
+                            return deviceConfig;
+                        } catch (Exception e) {
+                            throw new MyException(ResultEnum.DEFAULT_EXCEPTION);
+                        }
+                    }
+                }
+            }
+        }
+        throw new MyException(ResultEnum.NO_OBJECT);
+    }
+
+    @Override
+    public DeviceConfig addAction(String deviceId, String actionName) {
+        String configAddress = configPath + deviceId + ".xml";
+        File file = new File(configAddress);
+        DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
+        Action action = new Action(UUID.randomUUID().toString(), actionName, new ArrayList<>());
+        if (deviceConfig.getActions() == null) {
+            List<Action> actionList = new ArrayList<>();
+            actionList.add(action);
+            deviceConfig.setActions(new Actions(actionList));
+        } else {
+            if (deviceConfig.getActions().getActionList() == null) {
+                List<Action> actionList = new ArrayList<>();
+                actionList.add(action);
+                deviceConfig.getActions().setActionList(actionList);
+            } else {
+                deviceConfig.getActions().getActionList().add(action);
+            }
+        }
+        String content = XmlUtil.toXml(deviceConfig);
+        try {
+            FileUtil.writeFile(configAddress, content);
+            return deviceConfig;
+        } catch (Exception e) {
+            throw new MyException(ResultEnum.DEFAULT_EXCEPTION);
+        }
     }
 }

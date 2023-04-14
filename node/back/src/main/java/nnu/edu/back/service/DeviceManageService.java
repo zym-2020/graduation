@@ -35,4 +35,8 @@ public interface DeviceManageService {
     DeviceConfig updateActionParameter(String deviceId, String actionId, String stepId, List<String> parameters);
 
     DeviceConfig addStep(String deviceId, String actionId, String scriptId, List<String> parameters);
+
+    DeviceConfig deleteAction(String deviceId, String id, String type);
+
+    DeviceConfig addAction(String deviceId, String actionName);
 }

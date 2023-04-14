@@ -19,17 +19,22 @@ export interface DeviceAttribute {
 }
 
 export interface DeviceActions {
-  actionList: {
-    id: string;
-    name: string;
-    steps: {
-      id: string;
-      script: string;
-      parameters: {
-        parameterList: string[];
-      };
-    }[];
-  }[];
+  actionList:
+    | {
+        id: string;
+        name: string;
+        steps:
+          | {
+              id: string;
+              script: string;
+              scriptName: string;
+              parameters: {
+                parameterList: string[];
+              };
+            }[]
+          | null; 
+      }[]
+    | null;
 }
 
 export interface DeviceAttributeInstance {

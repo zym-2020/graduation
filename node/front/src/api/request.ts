@@ -57,6 +57,21 @@ export const addStep = async (jsonData: {
   return await post(`/device/addStep`, true, jsonData);
 };
 
+export const deleteAction = async (jsonData: {
+  deviceId: string;
+  id: string;
+  type: string;
+}) => {
+  return await post(`/device/deleteAction`, true, jsonData);
+};
+
+export const addAction = async (jsonData: {
+  deviceId: string;
+  actionName: string;
+}) => {
+  return await post(`/device/addAction`, true, jsonData);
+};
+
 //receiveRealTimeData相关接口
 export const checkPort = async (port: number) => {
   return await get(`/receiveRealTimeData/checkPort/${port}`, true);

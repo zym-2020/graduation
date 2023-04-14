@@ -84,4 +84,17 @@ public class DeviceManageController {
         List<String> parameters = jsonObject.getList("parameters", String.class);
         return ResultUtils.success(deviceManageService.addStep(deviceId, actionId, scriptId, parameters));
     }
+
+    @RequestMapping(value = "/deleteAction", method = RequestMethod.POST)
+    public JsonResult deleteAction(@RequestBody JSONObject jsonObject) {
+        String deviceId = jsonObject.getString("deviceId");
+        String id = jsonObject.getString("id");
+        String type = jsonObject.getString("type");
+        return ResultUtils.success(deviceManageService.deleteAction(deviceId, id, type));
+    }
+
+    @RequestMapping(value = "/addAction", method = RequestMethod.POST)
+    public JsonResult addAction(@RequestBody JSONObject jsonObject) {
+        return ResultUtils.success(deviceManageService.addAction(jsonObject.getString("deviceId"), jsonObject.getString("actionName")));
+    }
 }

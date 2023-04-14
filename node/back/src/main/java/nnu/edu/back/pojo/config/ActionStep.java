@@ -20,6 +20,7 @@ public class ActionStep {
     @XStreamAsAttribute
     String id;
     String script;
+    String scriptName;
 
     @XStreamAlias("parameters")
     ActionParameters parameters;

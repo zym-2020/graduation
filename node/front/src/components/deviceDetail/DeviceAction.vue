@@ -1,7 +1,9 @@
 <template>
   <div class="device-action">
     <div class="btn">
-      <el-button type="success" plain size="small">添加行为</el-button>
+      <el-button type="success" plain size="small" @click="addActionClick"
+        >添加行为</el-button
+      >
     </div>
     <el-scrollbar :max-height="maxHeight">
       <el-tree :data="treeData" :props="defaultProps">
@@ -28,11 +30,20 @@
               @click="paramClick(data.id, data.actionId)"
               ><Switch
             /></el-icon>
-            <el-icon v-else><CircleClose /></el-icon>
+            <el-icon v-else @click="closeClick(data.type, data.id)"
+              ><CircleClose
+            /></el-icon>
           </span>
         </template>
       </el-tree>
     </el-scrollbar>
+
+    <el-dialog v-model="addActionDialog" width="500">
+      <template #header>
+        <div class="my-header">添加行为</div>
+      </template>
+      <add-action @addActionCall="addActionCall" />
+    </el-dialog>
 
     <el-dialog v-model="scriptSettingDialog" width="800">
       <template #header>
@@ -65,8 +76,15 @@ import { Tree, DeviceActions } from "@/type";
 import router from "@/router";
 import ScriptSetting from "./ScriptSetting.vue";
 import ParamSetting from "./ParamSetting.vue";
-import { updateActionParameter, addStep } from "@/api/request";
+import {
+  updateActionParameter,
+  addStep,
+  deleteAction,
+  addAction,
+} from "@/api/request";
 import { notice } from "@/utils/common";
+import { ElMessageBox } from "element-plus";
+import AddAction from "./AddAction.vue";
 export default defineComponent({
   props: {
     actions: {
@@ -74,47 +92,47 @@ export default defineComponent({
     },
   },
   emits: ["deviceActionCall"],
-  components: { ParamSetting, ScriptSetting },
+  components: { ParamSetting, ScriptSetting, AddAction },
   setup(props, context) {
     let actionId = "";
     let stepId = "";
-    const scriptMap = router.currentRoute.value.params.scriptMap as any;
     const defaultProps = {
       children: "children",
       label: "label",
     };
     const scriptSettingDialog = ref(false);
     const paramSettingDialog = ref(false);
+    const addActionDialog = ref(false);
     const scriptId = ref("");
+    const scriptName = ref("");
     const parameterList = ref<string[]>([]);
 
-    const scriptName = computed(() => {
-      return scriptMap[scriptId.value];
-    });
-
     const treeData = computed(() => {
-      if (props.actions) {
+      if (props.actions && props.actions.actionList) {
         const data: Tree[] = [];
         props.actions.actionList.forEach((item) => {
           let stepArr: Tree[] = [];
-          item.steps.forEach((step) => {
-            let paramArr: Tree[] = [];
-            step.parameters.parameterList.forEach((param) => {
-              paramArr.push({
-                label: param,
-                type: "param",
+          if (item.steps) {
+            item.steps.forEach((step) => {
+              let paramArr: Tree[] = [];
+              step.parameters.parameterList.forEach((param) => {
+                paramArr.push({
+                  label: param,
+                  type: "param",
+                  id: step.id,
+                  actionId: item.id,
+                });
+              });
+              stepArr.push({
                 id: step.id,
+                label: step.scriptName,
+                type: "script",
+                children: paramArr,
                 actionId: item.id,
               });
             });
-            stepArr.push({
-              id: step.id,
-              label: scriptMap[step.script],
-              type: "script",
-              children: paramArr,
-              actionId: item.id,
-            });
-          });
+          }
+
           data.push({
             label: item.name,
             type: "action",
@@ -131,28 +149,68 @@ export default defineComponent({
       return height - (40 + 70 + 40) - (200 + 70 + 40 + 20);
     });
 
+    const addActionClick = () => {
+      addActionDialog.value = true;
+    };
+
     const addScript = (actionIdParam: string) => {
       scriptSettingDialog.value = true;
       actionId = actionIdParam;
     };
 
     const paramClick = (id: string, actionIdParam: string) => {
-      for (let i = 0; i < props.actions!.actionList.length; i++) {
-        for (let j = 0; j < props.actions!.actionList[i].steps.length; j++) {
-          if (
-            actionIdParam === props.actions!.actionList[i].id &&
-            id === props.actions!.actionList[i].steps[j].id
-          ) {
-            scriptId.value = props.actions!.actionList[i].steps[j].script;
-            parameterList.value = [
-              ...props.actions!.actionList[i].steps[j].parameters.parameterList,
-            ];
+      if (props.actions && props.actions.actionList) {
+        props.actions.actionList.forEach((item) => {
+          if (item.steps) {
+            item.steps.forEach((step) => {
+              if (actionIdParam === item.id && id === step.id) {
+                scriptId.value = step.script;
+                scriptName.value = step.scriptName;
+                parameterList.value = [...step.parameters.parameterList];
+              }
+            });
           }
-        }
+        });
       }
       actionId = actionIdParam;
       stepId = id;
       paramSettingDialog.value = true;
+    };
+
+    const closeClick = (type: string, id: string) => {
+      ElMessageBox.confirm(
+        `确定删除该${type === "action" ? "行为" : "脚本"}?`,
+        "警告",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(async () => {
+          console.log(type, id);
+          const deviceId = router.currentRoute.value.params.id as string;
+          const res = await deleteAction({
+            deviceId: deviceId,
+            id: id,
+            type: type,
+          });
+          if (res) {
+            context.emit("deviceActionCall", res.data);
+            notice("success", "成功", "修改设备行为");
+          }
+        })
+        .catch(() => {});
+    };
+
+    const addActionCall = async (val: string) => {
+      const deviceId = router.currentRoute.value.params.id as string;
+      const res = await addAction({ deviceId: deviceId, actionName: val });
+      if (res) {
+        context.emit("deviceActionCall", res.data);
+        notice("success", "成功", "添加行为");
+      }
+      addActionDialog.value = false;
     };
 
     const paramSettingCall = async (val: string[]) => {
@@ -197,8 +255,12 @@ export default defineComponent({
       scriptId,
       scriptName,
       parameterList,
+      addActionDialog,
       addScript,
       paramClick,
+      closeClick,
+      addActionClick,
+      addActionCall,
       paramSettingCall,
       scriptSettingCall,
     };
@@ -214,12 +276,6 @@ export default defineComponent({
     .el-button {
       right: 0px;
       position: absolute;
-      //   box-sizing: border-box;
-      //   border: solid 1px #081c42;
-      //   color: #081c42;
-      //   &:hover {
-      //     background: #f5f6f8;
-      //   }
     }
   }
 
