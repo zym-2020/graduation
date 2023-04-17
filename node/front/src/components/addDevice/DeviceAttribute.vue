@@ -237,6 +237,9 @@ export default defineComponent({
             left: 5px;
             color: #bbabb2;
             cursor: pointer;
+            &:hover {
+              color: #3c92ea;
+            }
           }
         }
         .el-button {

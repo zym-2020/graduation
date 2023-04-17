@@ -117,6 +117,7 @@ export default defineComponent({
                     push: {
                       protocol: form.value.protocol,
                       port: Number.parseInt(form.value.port),
+                      storage: "/",
                     },
                   };
                   const res = await initDevice(jsonData);

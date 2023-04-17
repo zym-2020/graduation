@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "35090269",
+      "name": "全屏-copy",
+      "font_class": "quanping-copy",
+      "unicode": "ee4d",
+      "unicode_decimal": 61005
+    },
+    {
+      "icon_id": "4777232",
+      "name": "全屏",
+      "font_class": "quanping",
+      "unicode": "ec13",
+      "unicode_decimal": 60435
+    },
+    {
+      "icon_id": "15196949",
+      "name": "23.input",
+      "font_class": "23input",
+      "unicode": "e628",
+      "unicode_decimal": 58920
+    },
+    {
       "icon_id": "12225043",
       "name": "必选",
       "font_class": "bixuan",

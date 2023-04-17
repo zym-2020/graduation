@@ -32,7 +32,7 @@ export interface DeviceActions {
                 parameterList: string[];
               };
             }[]
-          | null; 
+          | null;
       }[]
     | null;
 }
@@ -54,10 +54,14 @@ export interface DeviceConfig {
   push?: {
     protocol: string;
     port: number;
+    storage: string;
   };
   typing?: {
     type: string;
-    keys: string[];
+    keys?: {
+      keyList: string[];
+    };
+    storage: string;
   };
   actions?: DeviceActions;
 }

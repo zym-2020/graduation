@@ -67,9 +67,14 @@
               {{ port }}
             </div>
           </div>
+
           <div class="last-update">
             <strong>上次更新数据：</strong>
             {{ textHandle(status.lastUpdate, "yyyy-MM-dd hh:mm") }}
+          </div>
+          <div class="storage">
+            <strong>数据存储路径：</strong>
+            {{ storage }}
           </div>
           <div class="btn">
             <el-button
@@ -142,7 +147,11 @@ export default defineComponent({
       if (props.deviceConfig?.push) {
         return ["主动推送", ""];
       } else if (props.deviceConfig?.typing) {
-        return ["手动录入", "success"];
+        if (props.deviceConfig.typing.type === "input") {
+          return ["手动录入（文本录入）", "success"];
+        } else {
+          return ["手动录入（文件录入）", "success"];
+        }
       }
     });
 
@@ -152,6 +161,14 @@ export default defineComponent({
 
     const port = computed(() => {
       return props.deviceConfig?.push?.port;
+    });
+
+    const storage = computed(() => {
+      if (props.deviceConfig?.push) {
+        return props.deviceConfig.push.storage;
+      } else if (props.deviceConfig?.typing) {
+        return props.deviceConfig.typing.storage;
+      }
     });
 
     const activeName = ref("description");
@@ -228,6 +245,7 @@ export default defineComponent({
       port,
       protocol,
       deviceConfig,
+      storage,
       textHandle,
       parameters,
       openClick,
@@ -356,7 +374,8 @@ export default defineComponent({
       .type,
       .port,
       .protocol,
-      .last-update {
+      .last-update,
+      .storage {
         margin-top: 10px;
       }
       .btn {

@@ -222,9 +222,9 @@ export default defineComponent({
         return "主动推送";
       } else if (deviceConfig.value?.typing) {
         if (deviceConfig.value.typing.type === "input") {
-          return "手动录入（输入）";
+          return "手动录入（文本录入）";
         } else {
-          return "手动录入（文件）";
+          return "手动录入（文件录入）";
         }
       }
     });

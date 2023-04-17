@@ -3,7 +3,7 @@
     <device-attribute-componet @typeChange="typeChange" ref="deviceAttribute" />
     <div class="right">
       <push-device :typeValue="typeValue" @checkAttribute="checkAttribute" />
-      <typing-device />
+      <typing-device :typeValue="typeValue" @checkAttribute="checkAttribute" />
       <fetch-device />
     </div>
   </div>

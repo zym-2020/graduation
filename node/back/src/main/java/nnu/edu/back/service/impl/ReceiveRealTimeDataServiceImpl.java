@@ -125,7 +125,7 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
             TypingDataContent typingDataContent = new TypingDataContent();
             typingDataContent.setTime(timeFormat.format(new Date()));
             List<TypingKey> keys = new ArrayList<>();
-            for (String key : typing.getKeys()) {
+            for (String key : typing.getKeys().getKeyList()) {
                 keys.add(new TypingKey(key, jsonArray.getJSONObject(i).getString(key)));
             }
             typingDataContent.setKeys(keys);
