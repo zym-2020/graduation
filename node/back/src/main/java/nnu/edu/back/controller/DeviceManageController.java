@@ -97,4 +97,10 @@ public class DeviceManageController {
     public JsonResult addAction(@RequestBody JSONObject jsonObject) {
         return ResultUtils.success(deviceManageService.addAction(jsonObject.getString("deviceId"), jsonObject.getString("actionName")));
     }
+
+    @RequestMapping(value = "/updateStorage", method = RequestMethod.POST)
+    public JsonResult updateStorage(@RequestBody JSONObject jsonObject) {
+        deviceManageService.updateStorage(jsonObject.getString("deviceId"), jsonObject.getString("storage"));
+        return ResultUtils.success();
+    }
 }

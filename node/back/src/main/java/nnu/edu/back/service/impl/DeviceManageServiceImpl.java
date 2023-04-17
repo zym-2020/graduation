@@ -317,4 +317,24 @@ public class DeviceManageServiceImpl implements DeviceManageService {
             throw new MyException(ResultEnum.DEFAULT_EXCEPTION);
         }
     }
+
+    @Override
+    public void updateStorage(String deviceId, String storage) {
+        String configAddress = configPath + deviceId + ".xml";
+        File file = new File(configAddress);
+        DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
+        Push push = deviceConfig.getPush();
+        Typing typing = deviceConfig.getTyping();
+        if (push != null) {
+            push.setStorage(storage);
+        } else if (typing != null) {
+            typing.setStorage(storage);
+        }
+        String content = XmlUtil.toXml(deviceConfig);
+        try {
+            FileUtil.writeFile(configAddress, content);
+        } catch (Exception e) {
+            throw new MyException(ResultEnum.DEFAULT_EXCEPTION);
+        }
+    }
 }

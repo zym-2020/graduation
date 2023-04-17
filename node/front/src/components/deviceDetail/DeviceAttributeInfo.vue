@@ -74,9 +74,21 @@
           </div>
           <div class="storage">
             <strong>数据存储路径：</strong>
-            {{ storage }}
+            <span @click="storageClick">{{ storage }}</span>
           </div>
           <div class="btn">
+            <el-button type="info" plain v-if="addDataInputFlag"
+              >添加数据</el-button
+            >
+            <el-upload
+              :action="''"
+              :multiple="false"
+              :show-file-list="false"
+              v-if="addDataFileFlag"
+            >
+              <el-button type="info" plain>添加数据</el-button>
+            </el-upload>
+
             <el-button
               type="success"
               v-if="status.state === -1"
@@ -90,6 +102,15 @@
         </el-tab-pane>
       </el-tabs>
     </div>
+
+    <el-dialog v-model="paramSelectDialog" width="900" title="选择存储路径">
+      <param-select
+        :paramType="'path'"
+        @cancelCall="cancelCall"
+        @confirmCall="confirmCall"
+        v-if="paramSelectDialog"
+      />
+    </el-dialog>
   </div>
 </template>
 
@@ -100,8 +121,11 @@ import { imgBase64, notice, dateFormat } from "@/utils/common";
 import { prefix } from "@/prefix";
 import { startTCPServer, stopTCPServer } from "@/api/request";
 import DeviceAction from "./DeviceAction.vue";
+import ParamSelect from "./ParamSelect.vue";
+import { updateStorage, changeState } from "@/api/request";
+import router from "@/router";
 export default defineComponent({
-  components: { DeviceAction },
+  components: { DeviceAction, ParamSelect },
   props: {
     deviceConfig: {
       type: Object as PropType<DeviceConfig>,
@@ -116,6 +140,19 @@ export default defineComponent({
   setup(props) {
     const status = ref(props.status);
     const deviceConfig = ref<DeviceConfig>(props.deviceConfig!);
+    const paramSelectDialog = ref(false);
+    const storage = ref<string>(
+      (function () {
+        if (props.deviceConfig?.push) {
+          return props.deviceConfig.push.storage;
+        } else if (props.deviceConfig?.typing) {
+          return props.deviceConfig.typing.storage;
+        } else {
+          return "";
+        }
+      })()
+    );
+
     const imageUrl = computed(() => {
       if (
         props.deviceConfig?.deviceConfigAttribute.picture === null ||
@@ -136,6 +173,38 @@ export default defineComponent({
           prefix +
           `device/getPicture/${props.deviceConfig?.deviceConfigAttribute.picture}`
         );
+      }
+    });
+
+    const addDataInputFlag = computed(() => {
+      if (props.deviceConfig?.typing) {
+        if (
+          status.value?.state &&
+          status.value?.state === 1 &&
+          props.deviceConfig.typing.type === "input"
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    });
+
+    const addDataFileFlag = computed(() => {
+      if (props.deviceConfig?.typing) {
+        if (
+          status.value?.state &&
+          status.value?.state === 1 &&
+          props.deviceConfig.typing.type === "file"
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
       }
     });
 
@@ -161,14 +230,6 @@ export default defineComponent({
 
     const port = computed(() => {
       return props.deviceConfig?.push?.port;
-    });
-
-    const storage = computed(() => {
-      if (props.deviceConfig?.push) {
-        return props.deviceConfig.push.storage;
-      } else if (props.deviceConfig?.typing) {
-        return props.deviceConfig.typing.storage;
-      }
     });
 
     const activeName = ref("description");
@@ -214,6 +275,12 @@ export default defineComponent({
             status.value!.state = 1;
           }
         }
+      } else if (deviceConfig.value.typing) {
+        const res = await changeState(deviceConfig.value.id, 1);
+        if (res) {
+          notice("success", "成功", "启动成功");
+          status.value!.state = 1;
+        }
       }
     };
 
@@ -229,11 +296,41 @@ export default defineComponent({
             status.value!.state = -1;
           }
         }
+      } else if (deviceConfig.value.typing) {
+        const res = await changeState(deviceConfig.value.id, -1);
+        if (res) {
+          notice("success", "成功", "关闭监听");
+          status.value!.state = -1;
+        }
       }
     };
 
     const deviceActionCall = (val: DeviceConfig) => {
       deviceConfig.value = val;
+    };
+
+    const storageClick = () => {
+      paramSelectDialog.value = true;
+    };
+
+    const cancelCall = () => {
+      paramSelectDialog.value = false;
+    };
+
+    const confirmCall = async (val: { path: string[]; result: string }) => {
+      console.log(val);
+      const id = router.currentRoute.value.params.id as string;
+      let p = "";
+      val.path.forEach((item) => {
+        p += item + "/";
+      });
+      p += val.result;
+      const res = await updateStorage({ deviceId: id, storage: p });
+      if (res) {
+        storage.value = p;
+        notice("success", "成功", "修改存储路径");
+      }
+      paramSelectDialog.value = false;
     };
 
     return {
@@ -246,11 +343,17 @@ export default defineComponent({
       protocol,
       deviceConfig,
       storage,
+      paramSelectDialog,
+      addDataInputFlag,
+      addDataFileFlag,
       textHandle,
       parameters,
       openClick,
       closeClick,
       deviceActionCall,
+      cancelCall,
+      confirmCall,
+      storageClick,
     };
   },
 });
@@ -378,9 +481,22 @@ export default defineComponent({
       .storage {
         margin-top: 10px;
       }
+      .storage {
+        span {
+          cursor: pointer;
+          &:hover {
+            color: #409eff;
+            text-decoration: underline;
+          }
+        }
+      }
       .btn {
         margin-top: 10px;
         float: right;
+        display: flex;
+        .el-upload {
+          margin-right: 10px;
+        }
       }
     }
   }

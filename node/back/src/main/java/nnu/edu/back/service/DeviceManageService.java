@@ -39,4 +39,6 @@ public interface DeviceManageService {
     DeviceConfig deleteAction(String deviceId, String id, String type);
 
     DeviceConfig addAction(String deviceId, String actionName);
+
+    void updateStorage(String deviceId, String storage);
 }

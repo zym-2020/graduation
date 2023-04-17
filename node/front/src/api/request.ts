@@ -72,6 +72,13 @@ export const addAction = async (jsonData: {
   return await post(`/device/addAction`, true, jsonData);
 };
 
+export const updateStorage = async (jsonData: {
+  deviceId: string;
+  storage: string;
+}) => {
+  return await post(`/device/updateStorage`, true, jsonData);
+};
+
 //receiveRealTimeData相关接口
 export const checkPort = async (port: number) => {
   return await get(`/receiveRealTimeData/checkPort/${port}`, true);
@@ -87,6 +94,13 @@ export const startTCPServer = async (port: number, deviceId: string) => {
 export const stopTCPServer = async (port: number, deviceId: string) => {
   return await post(
     `/receiveRealTimeData/stopTCPServer/${port}/${deviceId}`,
+    true
+  );
+};
+
+export const changeState = async (deviceId: string, state: number) => {
+  return await post(
+    `/receiveRealTimeData/changeState/${deviceId}/${state}`,
     true
   );
 };
