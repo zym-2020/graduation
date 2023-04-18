@@ -18,7 +18,6 @@ public class TypingFileMapConverter implements Converter {
     @Override
     public void marshal(Object o, HierarchicalStreamWriter hierarchicalStreamWriter, MarshallingContext marshallingContext) {
         TypingFileMap typingFileMap = (TypingFileMap) o;
-        hierarchicalStreamWriter.addAttribute("name", typingFileMap.getName());
         hierarchicalStreamWriter.addAttribute("time", typingFileMap.getTime());
         hierarchicalStreamWriter.setValue(typingFileMap.getValue());
     }
@@ -26,7 +25,6 @@ public class TypingFileMapConverter implements Converter {
     @Override
     public Object unmarshal(HierarchicalStreamReader hierarchicalStreamReader, UnmarshallingContext unmarshallingContext) {
         TypingFileMap typingFileMap = new TypingFileMap();
-        typingFileMap.setName(hierarchicalStreamReader.getAttribute("name"));
         typingFileMap.setTime(hierarchicalStreamReader.getAttribute("time"));
         typingFileMap.setValue(hierarchicalStreamReader.getValue());
         return typingFileMap;

@@ -80,14 +80,17 @@
             <el-button type="info" plain v-if="addDataInputFlag"
               >添加数据</el-button
             >
-            <el-upload
+            <el-button type="info" plain v-if="addDataFileFlag"
+              >添加数据</el-button
+            >
+            <!-- <el-upload
               :action="''"
-              :multiple="false"
               :show-file-list="false"
+              :multiple="true"
               v-if="addDataFileFlag"
             >
               <el-button type="info" plain>添加数据</el-button>
-            </el-upload>
+            </el-upload> -->
 
             <el-button
               type="success"
@@ -494,7 +497,7 @@ export default defineComponent({
         margin-top: 10px;
         float: right;
         display: flex;
-        .el-upload {
+        /deep/ .el-upload {
           margin-right: 10px;
         }
       }

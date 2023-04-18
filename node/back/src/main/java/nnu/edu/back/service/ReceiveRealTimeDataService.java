@@ -24,6 +24,8 @@ public interface ReceiveRealTimeDataService {
 
     void typingData(String deviceId, JSONArray jsonArray);
 
+    int checkFileName(String address, String fileName);
+
     void typingFileUpload(String tempId, MultipartFile multipartFile, String fileName);
 
     void typingFileMerge(String tempId, String deviceId, int count, String fileName);

@@ -19,6 +19,5 @@ import nnu.edu.back.common.utils.TypingFileMapConverter;
 @XStreamConverter(TypingFileMapConverter.class)
 public class TypingFileMap {
     String time;
-    String name;
     String value;
 }

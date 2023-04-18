@@ -58,6 +58,11 @@ public class ReceiveRealTimeDataController {
         return ResultUtils.success();
     }
 
+    @RequestMapping(value = "/checkFileName", method = RequestMethod.POST)
+    public JsonResult checkFileName(@RequestBody JSONObject jsonObject) {
+        return ResultUtils.success(receiveRealTimeDataService.checkFileName(jsonObject.getString("address"), jsonObject.getString("fileName")));
+    }
+
     @RequestMapping(value = "/typingFileUpload/{tempId}/{fileName}", method = RequestMethod.POST)
     public JsonResult typingFileUpload(@PathVariable String tempId, @PathVariable String fileName, @RequestParam MultipartFile file) {
         receiveRealTimeDataService.typingFileUpload(tempId, file, fileName);

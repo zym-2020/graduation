@@ -199,9 +199,13 @@ import { getDeviceData, createFolder } from "@/api/request";
 import { DeviceConfig } from "@/type";
 import router from "@/router";
 import AddFolder from "./AddFolder.vue";
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
+
 export default defineComponent({
   components: { AddFolder },
   setup() {
+    NProgress.configure({ showSpinner: false });
     const tableHeight = ref(0);
     const contentComponent = ref<HTMLElement>();
     const path = ref<string[]>([]);
@@ -278,6 +282,7 @@ export default defineComponent({
     };
 
     const refresh = async () => {
+      NProgress.start();
       let p = "";
       if (path.value.length > 0) {
         p = path.value[0];
@@ -288,11 +293,10 @@ export default defineComponent({
         p = "/";
       }
       const id: string = router.currentRoute.value.params.id as string;
-      loading.value = true;
       const res = await getDeviceData(id, { path: p });
       if (res) {
         dataList.value = res.data;
-        loading.value = false;
+        NProgress.done();
       }
     };
 

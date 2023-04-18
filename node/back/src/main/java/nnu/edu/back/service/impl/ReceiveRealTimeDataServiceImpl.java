@@ -54,6 +54,9 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
     @Value("${typingFilePath}")
     String typingFilePath;
 
+    @Value("${dataPath}")
+    String dataPath;
+
     @Autowired
     DeviceMapper deviceMapper;
 
@@ -158,6 +161,19 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
     }
 
     @Override
+    public int checkFileName(String address, String fileName) {
+        String path;
+        if (address.equals("/")) {
+            path = dataPath + fileName;
+        } else {
+            path = dataPath + address + "/" + fileName;
+        }
+        File file = new File(path);
+        if (file.exists()) return -1;
+        else return 1;
+    }
+
+    @Override
     public void typingFileUpload(String tempId, MultipartFile multipartFile, String fileName) {
         String address = tempPath + tempId;
         try {
@@ -170,22 +186,28 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
     @Override
     public void typingFileMerge(String tempId, String deviceId, int count, String fileName) {
         DeviceConfig deviceConfig = XmlUtil.fromXml(new File(configPath + deviceId), DeviceConfig.class);
-        if (!deviceConfig.getTyping().getType().equals("file")) {
-            String suffix = fileName.substring(fileName.lastIndexOf("."));
-            String uid = UUID.randomUUID().toString();
+        if (deviceConfig.getTyping().getType().equals("file")) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+            String targetFilePath;
+            String path;
+            if (deviceConfig.getTyping().getStorage().equals("/")) {
+                targetFilePath = dataPath + deviceId + "/" + fileName;
+                path = dataPath + deviceId + "/" + dateFormat.format(new Date()) + ".xml";
+            } else {
+                targetFilePath = dataPath + deviceId + "/" + deviceConfig.getTyping().getStorage() + "/" + fileName;
+                path = dataPath + deviceId + "/" + deviceConfig.getTyping().getStorage() + "/" + dateFormat.format(new Date()) + ".xml";
+            }
             try {
-                FileUtil.multipartMerge(typingDataPath + deviceId + "/file/" + uid + suffix, tempPath + tempId, count);
+                FileUtil.multipartMerge(targetFilePath, tempPath + tempId, count);
             } catch (Exception e) {
                 throw new MyException(ResultEnum.FILE_READ_OR_WRITE_ERROR);
             }
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
             TypingFileMap typingFileMap = new TypingFileMap();
             typingFileMap.setTime(timeFormat.format(new Date()));
-            typingFileMap.setName(fileName);
-            typingFileMap.setValue(uid + suffix);
+            typingFileMap.setValue(fileName);
 
-            String path = typingFilePath + deviceId + dateFormat.format(new Date()) + ".xml";
             File file = new File(path);
             TypingFile typingFile;
             if (file.exists()) {
