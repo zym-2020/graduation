@@ -3,6 +3,7 @@ package nnu.edu.back.netty;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
@@ -41,7 +42,7 @@ public class BootNettyChannelInitializer<SocketChannel> extends ChannelInitializ
          * 下面这段代码设置连接等待时间，注释掉的话服务端就一直连接，不主动断掉
          */
 //        channel.pipeline().addLast(new IdleStateHandler(READ_TIME_OUT, WRITE_TIME_OUT, ALL_TIME_OUT, TimeUnit.SECONDS));
-
+        channel.config().setRecvByteBufAllocator(new FixedRecvByteBufAllocator(1024 * 512));
         //带编码
         channel.pipeline().addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
         channel.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));

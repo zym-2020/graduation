@@ -137,13 +137,16 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg == null) return;
-        String data = (String) msg;
-        String channelId = ctx.channel().id().toString();
-        System.out.println("channelId=" + channelId + "data=" + data);
-        InetSocketAddress inSocket = (InetSocketAddress) ctx.channel().remoteAddress();
-        handleMethod(data, inSocket.getAddress().toString().replace("/", ""), String.valueOf(inSocket.getPort()));
+        if (msg != null) {
+            String data = (String) msg;
+            String channelId = ctx.channel().id().toString();
+            System.out.println("channelId=" + channelId + "data=" + data);
+            InetSocketAddress inSocket = (InetSocketAddress) ctx.channel().remoteAddress();
+            handleMethod(data, inSocket.getAddress().toString().replace("/", ""), String.valueOf(inSocket.getPort()));
+        }
+        ctx.fireChannelRead(msg);
     }
+
 
 
     /**

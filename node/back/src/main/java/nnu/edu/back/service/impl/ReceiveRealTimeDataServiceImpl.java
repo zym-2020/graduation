@@ -79,7 +79,6 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
     @Override
     public void stopTCPServer(int port, String deviceId) {
         TCPServer tcpServer = cache.get(port);
-
         if (tcpServer != null) {
             tcpServer.stop();
             cache.remove(port);

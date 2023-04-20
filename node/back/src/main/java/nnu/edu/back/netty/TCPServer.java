@@ -13,6 +13,9 @@ import nnu.edu.back.service.SSEService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -40,12 +43,12 @@ public class TCPServer {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap = serverBootstrap.group(bossGroup, workerGroup);
-            serverBootstrap = serverBootstrap.channel(NioServerSocketChannel.class);
-            serverBootstrap = serverBootstrap.option(ChannelOption.SO_BACKLOG, 64);
-            serverBootstrap = serverBootstrap.childOption(ChannelOption.TCP_NODELAY, true);
-            serverBootstrap = serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
-            serverBootstrap = serverBootstrap.childHandler(new BootNettyChannelInitializer<SocketChannel>(this.config, this.sseService, this.deviceMapper));
+            serverBootstrap.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 64)
+                    .childOption(ChannelOption.TCP_NODELAY, true)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childHandler(new BootNettyChannelInitializer<SocketChannel>(this.config, this.sseService, this.deviceMapper));
             ChannelFuture f = serverBootstrap.bind(port).sync();
             currentChannel = f.channel();
             if (f.isSuccess()) {
@@ -65,6 +68,7 @@ public class TCPServer {
     }
 
     public void stop() {
+
         if (currentChannel != null) {
             log.info("关闭服务");
 
