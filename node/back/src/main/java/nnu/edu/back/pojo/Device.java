@@ -27,4 +27,5 @@ public class Device {
     Integer state;
     Date lastUpdate;
     Boolean register;
+    String tableName;
 }

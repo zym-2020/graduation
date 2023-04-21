@@ -1,14 +1,18 @@
 package nnu.edu.back.common.utils;
 
+import nnu.edu.back.dao.monitoring.MonitoringDataMapper;
 import nnu.edu.back.pojo.Device;
 import nnu.edu.back.pojo.datagram.Datagram;
 import nnu.edu.back.pojo.datagram.DatagramMessage;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,6 +54,38 @@ public class HandleRealTimeDataUtil {
                 throw e;
             }
         }
+    }
+
+    public static void normalHandle(byte[] bytes, MonitoringDataMapper monitoringDataMapper, String tableName) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String id = UUID.randomUUID().toString();
+        String time = dateFormat.format(new Date());
+        monitoringDataMapper.insertMonitoringData(tableName, id, time, bytes);
+    }
+
+
+    public static String bytesToHex(byte[] bytes) {
+        StringBuffer sb = new StringBuffer();
+        for(int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(bytes[i] & 0xFF);
+            if(hex.length() < 2){
+                sb.append(0);
+            }
+            sb.append(hex);
+        }
+        return sb.toString();
+    }
+
+    public static byte[] readStream(InputStream inStream) throws Exception{
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len = -1;
+        while((len = inStream.read(buffer)) != -1){
+            outStream.write(buffer, 0, len);
+        }
+        outStream.close();
+        inStream.close();
+        return outStream.toByteArray();
     }
 
 }

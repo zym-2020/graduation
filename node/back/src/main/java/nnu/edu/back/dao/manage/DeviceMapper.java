@@ -26,4 +26,6 @@ public interface DeviceMapper {
     void updateState(@Param("id") String deviceId, @Param("state") int state);
 
     void updateLastUpdate(@Param("id") String deviceId);
+
+    String getTableName(@Param("id") String deviceId);
 }

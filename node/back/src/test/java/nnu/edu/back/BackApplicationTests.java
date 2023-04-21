@@ -11,14 +11,11 @@ import java.io.File;
 
 @SpringBootTest
 class BackApplicationTests {
-    @Autowired
-    DeviceMapper deviceMapper;
+
 
     @Test
     void contextLoads() {
-        File file = new File("D:\\zhuomian\\毕业\\node-manage\\temp");
-        System.out.println(file.lastModified());
-        System.out.println(System.currentTimeMillis());
+        System.out.println("device" + System.currentTimeMillis());
     }
 
 }

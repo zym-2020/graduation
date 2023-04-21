@@ -75,7 +75,8 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         }
         DeviceConfigAttribute attribute = deviceConfig.getDeviceConfigAttribute();
         Push push = deviceConfig.getPush();
-        deviceMapper.insertDevice(new Device(uuid, attribute.getName(), attribute.getPicture(), attribute.getLongitude(), attribute.getLatitude(), attribute.getDescription(), push == null ? null : Integer.valueOf(push.getPort()), -1, null, false));
+        String tableName = "device" + System.currentTimeMillis();
+        deviceMapper.insertDevice(new Device(uuid, attribute.getName(), attribute.getPicture(), attribute.getLongitude(), attribute.getLatitude(), attribute.getDescription(), push == null ? null : Integer.valueOf(push.getPort()), -1, null, false, push == null ? null : tableName));
     }
 
     @Override

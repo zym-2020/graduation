@@ -7,7 +7,7 @@ spring:
       password: 123
       driver-class-name: org.postgresql.Driver
     monitoring:
-      jdbc-url: D:/zhuomian/毕业/node-manage/monitoring.db
+      jdbc-url: jdbc:sqlite:D:/zhuomian/毕业/node-manage/monitoring.db
       driver-class-name: org.sqlite.JDBC
 
 

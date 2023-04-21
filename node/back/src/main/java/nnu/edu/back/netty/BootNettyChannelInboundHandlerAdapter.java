@@ -2,6 +2,8 @@ package nnu.edu.back.netty;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -11,6 +13,7 @@ import nnu.edu.back.common.utils.ProcessUtil;
 import nnu.edu.back.common.utils.ScriptUtil;
 import nnu.edu.back.common.utils.XmlUtil;
 import nnu.edu.back.dao.manage.DeviceMapper;
+import nnu.edu.back.dao.monitoring.MonitoringDataMapper;
 import nnu.edu.back.pojo.config.Action;
 import nnu.edu.back.pojo.config.ActionStep;
 import nnu.edu.back.pojo.config.DeviceConfig;
@@ -18,12 +21,16 @@ import nnu.edu.back.pojo.config.Push;
 import nnu.edu.back.pojo.scriptConfig.ScriptConfig;
 import nnu.edu.back.service.SSEService;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,18 +45,17 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
     private String config;
     private SSEService sseService;
     private DeviceMapper deviceMapper;
-
-    private static String dataPath = "D:/zhuomian/毕业/node-manage/data/";
-    private static String scriptPath = "D:/zhuomian/毕业/node-manage/scripts/";
+    private MonitoringDataMapper monitoringDataMapper;
 
 
-    public BootNettyChannelInboundHandlerAdapter(String config, SSEService sseService, DeviceMapper deviceMapper) {
+    public BootNettyChannelInboundHandlerAdapter(String config, SSEService sseService, DeviceMapper deviceMapper, MonitoringDataMapper monitoringDataMapper) {
         this.config = config;
         this.sseService = sseService;
         this.deviceMapper = deviceMapper;
+        this.monitoringDataMapper = monitoringDataMapper;
     }
 
-    private void handleMethod(String data, String clientAddress, String clientPort) throws Exception {
+    private void handleMethod(byte[] bytes) throws Exception {
         File file = new File(this.config);
         if (!file.exists()) {
             throw new Exception();
@@ -58,47 +64,10 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         if (deviceConfig.getPush() != null) {
-            Push push = deviceConfig.getPush();
-            String path = push.getStorage().equals("/") ? dataPath + deviceConfig.getId() + "/" + dateFormat.format(new Date()) + ".xml": dataPath + deviceConfig.getId() + "/" + push.getStorage() + "/" + dateFormat.format(new Date()) + ".xml";
-            HandleRealTimeDataUtil.normalHandle(path, deviceConfig.getId(), push.getPort(), push.getProtocol(), clientAddress, clientPort, data);
+            String tableName = deviceMapper.getTableName(deviceConfig.getId());
+            HandleRealTimeDataUtil.normalHandle(bytes, this.monitoringDataMapper, tableName);
         }
-        if (deviceConfig.getActions() != null && deviceConfig.getActions().getActionList().size() > 0) {
-            List<Action> actions = deviceConfig.getActions().getActionList();
-            for (Action action : actions) {
-                new Thread() {
-                    @Override
-                    @SneakyThrows
-                    public void run() {
-                        List<ActionStep> steps = action.getSteps();
-                        for (ActionStep step : steps) {
-                            String id = step.getScript();
-                            File file = new File(scriptPath + id + "/scriptConfig.xml");
-                            if (!file.exists()) {
-                                throw new Exception();
-                            }
-                            ScriptConfig scriptConfig = XmlUtil.fromXml(file, ScriptConfig.class);
-                            String paramPath = ScriptUtil.actionParamUtil(step, data, deviceConfig.getId());
-                            List<String> command = new ArrayList<>();
-                            command.add("cmd");
-                            command.add("/c");
-                            command.add("d: " + "&&" + " cd " + scriptPath + scriptConfig.getId() + "/code" + " && " + scriptConfig.getEnter() + " " + paramPath);
-                            try {
-                                Process process = ProcessUtil.exeProcess(command);
-                                String result = ProcessUtil.readProcessString(process.getInputStream());
-                                int state = process.exitValue();
-                                System.out.println(result);
-                                if (state != 0) {
-                                    System.out.println("出错了");
-                                }
-                            } catch (Exception e) {
-                                System.out.println("出错了");
-                            }
-                        }
-                    }
-                }.start();
-            }
 
-        }
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", deviceConfig.getId());
         jsonObject.put("time", format.format(new Date()));
@@ -137,14 +106,20 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+
         if (msg != null) {
-            String data = (String) msg;
             String channelId = ctx.channel().id().toString();
-            System.out.println("channelId=" + channelId + "data=" + data);
-            InetSocketAddress inSocket = (InetSocketAddress) ctx.channel().remoteAddress();
-            handleMethod(data, inSocket.getAddress().toString().replace("/", ""), String.valueOf(inSocket.getPort()));
+            System.out.println("channelId=" + channelId);
+//            InetSocketAddress inSocket = (InetSocketAddress) ctx.channel().remoteAddress();
+            ByteBuf byteBuf = (ByteBuf) msg;
+            InputStream is = new ByteBufInputStream(byteBuf);
+            byte[] bytes = HandleRealTimeDataUtil.readStream(is);
+            String result = new String(bytes);
+            handleMethod(bytes);
+
+            ctx.fireChannelRead(result);
         }
-        ctx.fireChannelRead(msg);
+
     }
 
 

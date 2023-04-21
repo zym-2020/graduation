@@ -8,6 +8,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 import nnu.edu.back.dao.manage.DeviceMapper;
+import nnu.edu.back.dao.monitoring.MonitoringDataMapper;
 import nnu.edu.back.service.SSEService;
 
 /**
@@ -28,11 +29,13 @@ public class BootNettyChannelInitializer<SocketChannel> extends ChannelInitializ
     private String config;
     private SSEService sseService;
     private DeviceMapper deviceMapper;
+    private MonitoringDataMapper monitoringDataMapper;
 
-    public BootNettyChannelInitializer(String config, SSEService sseService, DeviceMapper deviceMapper) {
+    public BootNettyChannelInitializer(String config, SSEService sseService, DeviceMapper deviceMapper, MonitoringDataMapper monitoringDataMapper) {
         this.config = config;
         this.sseService = sseService;
         this.deviceMapper = deviceMapper;
+        this.monitoringDataMapper = monitoringDataMapper;
     }
 
     @Override
@@ -42,12 +45,16 @@ public class BootNettyChannelInitializer<SocketChannel> extends ChannelInitializ
          * 下面这段代码设置连接等待时间，注释掉的话服务端就一直连接，不主动断掉
          */
 //        channel.pipeline().addLast(new IdleStateHandler(READ_TIME_OUT, WRITE_TIME_OUT, ALL_TIME_OUT, TimeUnit.SECONDS));
+        /**
+         * 设置ByteBuf大小
+         */
         channel.config().setRecvByteBufAllocator(new FixedRecvByteBufAllocator(1024 * 512));
         //带编码
-        channel.pipeline().addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-        channel.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
+//        channel.pipeline().addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
+//        channel.pipeline().addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
 
         //自定义ChannelInboundHandlerAdapter
-        channel.pipeline().addLast(new BootNettyChannelInboundHandlerAdapter(this.config, this.sseService, this.deviceMapper));
+        channel.pipeline().addLast(new BootNettyChannelInboundHandlerAdapter(this.config, this.sseService, this.deviceMapper, this.monitoringDataMapper));
+        channel.pipeline().addLast(new ActionChannelInboundHandlerAdapter(this.config));
     }
 }

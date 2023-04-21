@@ -6,6 +6,7 @@ import nnu.edu.back.common.result.ResultEnum;
 import nnu.edu.back.common.utils.FileUtil;
 import nnu.edu.back.common.utils.XmlUtil;
 import nnu.edu.back.dao.manage.DeviceMapper;
+import nnu.edu.back.dao.monitoring.MonitoringDataMapper;
 import nnu.edu.back.netty.TCPServer;
 import nnu.edu.back.netty.UDPServer;
 import nnu.edu.back.pojo.Device;
@@ -63,10 +64,13 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
     @Autowired
     SSEService sseService;
 
+    @Autowired
+    MonitoringDataMapper monitoringDataMapper;
+
     @Override
     @Async("asyncServiceExecutor")
     public void startTCPServer(int port, String deviceId) throws InterruptedException {
-        TCPServer tcpServer = new TCPServer(configPath + deviceId + ".xml", sseService, deviceMapper);
+        TCPServer tcpServer = new TCPServer(configPath + deviceId + ".xml", sseService, deviceMapper, monitoringDataMapper);
         cache.put(port, tcpServer);
         deviceMapper.updateState(deviceId, 1);
         /**
