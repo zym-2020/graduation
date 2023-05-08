@@ -12,7 +12,6 @@
         <result column="state" property="state"></result>
         <result column="last_update" property="lastUpdate"></result>
         <result column="register" property="register"></result>
-        <result column="table_name" property="tableName"></result>
     </resultMap>
 
     <select id="queryByPort" resultMap="DeviceMap">
@@ -20,7 +19,7 @@
     </select>
 
     <insert id="insertDevice">
-        insert into device values(#{device.id}, #{device.name}, #{device.picture}, #{device.longitude}, #{device.latitude}, #{device.description}, #{device.port}, #{device.state}, #{device.lastUpdate}, #{device.tableName})
+        insert into device values(#{device.id}, #{device.name}, #{device.picture}, #{device.longitude}, #{device.latitude}, #{device.description}, #{device.port}, #{device.state}, #{device.lastUpdate})
     </insert>
 
     <select id="getAllDevice" resultMap="DeviceMap">

@@ -41,4 +41,6 @@ public interface DeviceManageService {
     DeviceConfig addAction(String deviceId, String actionName);
 
     void updateStorage(String deviceId, String storage);
+
+    List<Map<String, Object>> test();
 }

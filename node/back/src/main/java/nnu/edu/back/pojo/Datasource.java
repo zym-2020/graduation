@@ -4,27 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 /**
  * Created with IntelliJ IDEA.
  *
  * @Author: Yiming
- * @Date: 2023/03/28/11:10
+ * @Date: 2023/05/08/9:57
  * @Description:
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Device {
+public class Datasource {
     String id;
-    String name;
-    String picture;
-    Float longitude;
-    Float latitude;
-    String description;
-    Integer port;
-    Integer state;
-    Date lastUpdate;
-    Boolean register;
+    String jdbcUrl;
+    String driverClass;
+    String userName;
+    String password;
+    String deviceId;
 }

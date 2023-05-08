@@ -4,4 +4,8 @@
     <insert id="insertMonitoringData">
         insert into ${tableName} values (#{id}, #{time}, #{data, typeHandler=nnu.edu.back.common.utils.BlobTypeHandler})
     </insert>
+
+    <select id="test" resultType="java.util.HashMap">
+        select * from ${tableName}
+    </select>
 </mapper>

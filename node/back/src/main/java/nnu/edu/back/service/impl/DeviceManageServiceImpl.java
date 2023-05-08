@@ -7,6 +7,7 @@ import nnu.edu.back.common.utils.FileUtil;
 import nnu.edu.back.common.utils.XmlUtil;
 import nnu.edu.back.dao.manage.DeviceMapper;
 import nnu.edu.back.dao.manage.ScriptMapper;
+import nnu.edu.back.dao.monitoring.MonitoringDataMapper;
 import nnu.edu.back.pojo.Device;
 import nnu.edu.back.pojo.config.*;
 import nnu.edu.back.service.DeviceManageService;
@@ -39,12 +40,6 @@ public class DeviceManageServiceImpl implements DeviceManageService {
     @Value("${configPath}")
     String configPath;
 
-    @Value("${typingDataPath}")
-    String typingDataPath;
-
-    @Value("${typingFilePath}")
-    String typingFilePath;
-
     @Value("${dataPath}")
     String dataPath;
 
@@ -53,6 +48,9 @@ public class DeviceManageServiceImpl implements DeviceManageService {
 
     @Autowired
     ScriptMapper scriptMapper;
+
+    @Autowired
+    MonitoringDataMapper monitoringDataMapper;
 
     @Override
     public String uploadDevicePicture(MultipartFile file) {
@@ -75,8 +73,7 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         }
         DeviceConfigAttribute attribute = deviceConfig.getDeviceConfigAttribute();
         Push push = deviceConfig.getPush();
-        String tableName = "device" + System.currentTimeMillis();
-        deviceMapper.insertDevice(new Device(uuid, attribute.getName(), attribute.getPicture(), attribute.getLongitude(), attribute.getLatitude(), attribute.getDescription(), push == null ? null : Integer.valueOf(push.getPort()), -1, null, false, push == null ? null : tableName));
+        deviceMapper.insertDevice(new Device(uuid, attribute.getName(), attribute.getPicture(), attribute.getLongitude(), attribute.getLatitude(), attribute.getDescription(), push == null ? null : Integer.valueOf(push.getPort()), -1, null, false));
     }
 
     @Override
@@ -324,11 +321,8 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         String configAddress = configPath + deviceId + ".xml";
         File file = new File(configAddress);
         DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
-        Push push = deviceConfig.getPush();
         Typing typing = deviceConfig.getTyping();
-        if (push != null) {
-            push.setStorage(storage);
-        } else if (typing != null) {
+        if (typing != null) {
             typing.setStorage(storage);
         }
         String content = XmlUtil.toXml(deviceConfig);
@@ -337,5 +331,10 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         } catch (Exception e) {
             throw new MyException(ResultEnum.DEFAULT_EXCEPTION);
         }
+    }
+
+    @Override
+    public List<Map<String, Object>> test() {
+        return monitoringDataMapper.test("7c156025-b4e5-4b0b-8a4a-e5462a4a6d31", "t202313");
     }
 }

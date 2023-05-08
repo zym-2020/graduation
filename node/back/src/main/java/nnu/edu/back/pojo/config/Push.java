@@ -17,5 +17,4 @@ import lombok.NoArgsConstructor;
 public class Push {
     String protocol;
     String port;
-    String storage;
 }

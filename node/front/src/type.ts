@@ -54,7 +54,6 @@ export interface DeviceConfig {
   push?: {
     protocol: string;
     port: number;
-    storage: string;
   };
   typing?: {
     type: string;

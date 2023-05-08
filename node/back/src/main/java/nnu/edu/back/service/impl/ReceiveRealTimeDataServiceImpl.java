@@ -46,14 +46,8 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
     @Value("${configPath}")
     String configPath;
 
-    @Value("${typingDataPath}")
-    String typingDataPath;
-
     @Value("${tempPath}")
     String tempPath;
-
-    @Value("${typingFilePath}")
-    String typingFilePath;
 
     @Value("${dataPath}")
     String dataPath;
@@ -137,14 +131,15 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
             typingDataContent.setKeys(keys);
             typingDataContents.add(typingDataContent);
         }
-        String dataPath = typingDataPath + deviceId + "/" + dateFormat.format(new Date()) + ".xml";
-        File dataFile = new File(dataPath);
+        String storage = typing.getStorage().equals("/") ? "" : typing.getStorage() + "/";
+        String resultPath = dataPath + deviceId + "/" + storage + dateFormat.format(new Date()) + ".xml";
+        File dataFile = new File(resultPath);
         if (dataFile.exists()) {
             TypingData typingData = XmlUtil.fromXml(dataFile, TypingData.class);
             typingData.getTypingDataContents().addAll(typingDataContents);
             String xmlString = XmlUtil.toXml(typingData);
             try {
-                FileUtil.writeFile(dataPath, xmlString);
+                FileUtil.writeFile(resultPath, xmlString);
             } catch (Exception e) {
                 throw new MyException(ResultEnum.FILE_READ_OR_WRITE_ERROR);
             }
@@ -155,7 +150,7 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
             typingData.setTypingDataContents(typingDataContents);
             String xmlString = XmlUtil.toXml(typingData);
             try {
-                FileUtil.writeFile(dataPath, xmlString);
+                FileUtil.writeFile(resultPath, xmlString);
             } catch (Exception e) {
                 throw new MyException(ResultEnum.FILE_READ_OR_WRITE_ERROR);
             }

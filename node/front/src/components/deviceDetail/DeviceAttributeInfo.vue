@@ -65,14 +65,14 @@
             <div class="port" v-if="type[1] === ''">
               <strong>监听端口：</strong>
               {{ port }}
-            </div>
+            </div>  
           </div>
 
           <div class="last-update">
             <strong>上次更新数据：</strong>
             {{ textHandle(status.lastUpdate, "yyyy-MM-dd hh:mm") }}
           </div>
-          <div class="storage">
+          <div class="storage" v-if="type[0] != '主动推送'">
             <strong>数据存储路径：</strong>
             <span @click="storageClick">{{ storage }}</span>
           </div>
@@ -146,9 +146,7 @@ export default defineComponent({
     const paramSelectDialog = ref(false);
     const storage = ref<string>(
       (function () {
-        if (props.deviceConfig?.push) {
-          return props.deviceConfig.push.storage;
-        } else if (props.deviceConfig?.typing) {
+        if (props.deviceConfig?.typing) {
           return props.deviceConfig.typing.storage;
         } else {
           return "";
