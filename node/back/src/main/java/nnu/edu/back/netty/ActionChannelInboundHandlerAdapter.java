@@ -50,44 +50,46 @@ public class ActionChannelInboundHandlerAdapter extends ChannelInboundHandlerAda
             throw new Exception();
         }
         DeviceConfig deviceConfig = XmlUtil.fromXml(file, DeviceConfig.class);
-        if (deviceConfig.getActions() != null && deviceConfig.getActions().getActionList().size() > 0 && msg != null) {
-
-            String result = (String) msg;
-            List<Action> actions = deviceConfig.getActions().getActionList();
-            for (Action action : actions) {
-                new Thread() {
-                    @Override
-                    @SneakyThrows
-                    public void run() {
-                        List<ActionStep> steps = action.getSteps();
-                        for (ActionStep step : steps) {
-                            String id = step.getScript();
-                            File file = new File(scriptPath + id + "/scriptConfig.xml");
-                            if (!file.exists()) {
-                                throw new Exception();
-                            }
-                            ScriptConfig scriptConfig = XmlUtil.fromXml(file, ScriptConfig.class);
-                            String paramPath = ScriptUtil.actionParamUtil(step, result, deviceConfig.getId());
-                            List<String> command = new ArrayList<>();
-                            command.add("cmd");
-                            command.add("/c");
-                            command.add("d: " + "&&" + " cd " + scriptPath + scriptConfig.getId() + "/code" + " && " + scriptConfig.getEnter() + " " + paramPath);
-                            try {
-                                Process process = ProcessUtil.exeProcess(command);
-                                String result = ProcessUtil.readProcessString(process.getInputStream());
-                                int state = process.exitValue();
-                                System.out.println(result);
-                                if (state != 0) {
-                                    System.out.println("出错了");
-                                }
-                            } catch (Exception e) {
-                                System.out.println("出错了");
-                            }
-                        }
-                    }
-                }.start();
-            }
-
-        }
+        byte[] bytes = (byte[]) msg;
+        System.out.println(1);
+//        if (deviceConfig.getActions() != null && deviceConfig.getActions().getActionList().size() > 0 && msg != null) {
+//
+//            String result = (String) msg;
+//            List<Action> actions = deviceConfig.getActions().getActionList();
+//            for (Action action : actions) {
+//                new Thread() {
+//                    @Override
+//                    @SneakyThrows
+//                    public void run() {
+//                        List<ActionStep> steps = action.getSteps();
+//                        for (ActionStep step : steps) {
+//                            String id = step.getScript();
+//                            File file = new File(scriptPath + id + "/scriptConfig.xml");
+//                            if (!file.exists()) {
+//                                throw new Exception();
+//                            }
+//                            ScriptConfig scriptConfig = XmlUtil.fromXml(file, ScriptConfig.class);
+//                            String paramPath = ScriptUtil.actionParamUtil(step, result, deviceConfig.getId());
+//                            List<String> command = new ArrayList<>();
+//                            command.add("cmd");
+//                            command.add("/c");
+//                            command.add("d: " + "&&" + " cd " + scriptPath + scriptConfig.getId() + "/code" + " && " + scriptConfig.getEnter() + " " + paramPath);
+//                            try {
+//                                Process process = ProcessUtil.exeProcess(command);
+//                                String result = ProcessUtil.readProcessString(process.getInputStream());
+//                                int state = process.exitValue();
+//                                System.out.println(result);
+//                                if (state != 0) {
+//                                    System.out.println("出错了");
+//                                }
+//                            } catch (Exception e) {
+//                                System.out.println("出错了");
+//                            }
+//                        }
+//                    }
+//                }.start();
+//            }
+//
+//        }
     }
 }

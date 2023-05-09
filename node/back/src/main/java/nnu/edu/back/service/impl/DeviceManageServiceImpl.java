@@ -6,8 +6,9 @@ import nnu.edu.back.common.result.ResultEnum;
 import nnu.edu.back.common.utils.FileUtil;
 import nnu.edu.back.common.utils.XmlUtil;
 import nnu.edu.back.dao.manage.DeviceMapper;
+import nnu.edu.back.dao.manage.DynamicDatasourceMapper;
 import nnu.edu.back.dao.manage.ScriptMapper;
-import nnu.edu.back.dao.monitoring.MonitoringDataMapper;
+import nnu.edu.back.pojo.Datasource;
 import nnu.edu.back.pojo.Device;
 import nnu.edu.back.pojo.config.*;
 import nnu.edu.back.service.DeviceManageService;
@@ -43,6 +44,9 @@ public class DeviceManageServiceImpl implements DeviceManageService {
     @Value("${dataPath}")
     String dataPath;
 
+    @Value("${databasePath}")
+    String databasePath;
+
     @Autowired
     DeviceMapper deviceMapper;
 
@@ -50,7 +54,7 @@ public class DeviceManageServiceImpl implements DeviceManageService {
     ScriptMapper scriptMapper;
 
     @Autowired
-    MonitoringDataMapper monitoringDataMapper;
+    DynamicDatasourceMapper dynamicDatasourceMapper;
 
     @Override
     public String uploadDevicePicture(MultipartFile file) {
@@ -74,6 +78,11 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         DeviceConfigAttribute attribute = deviceConfig.getDeviceConfigAttribute();
         Push push = deviceConfig.getPush();
         deviceMapper.insertDevice(new Device(uuid, attribute.getName(), attribute.getPicture(), attribute.getLongitude(), attribute.getLatitude(), attribute.getDescription(), push == null ? null : Integer.valueOf(push.getPort()), -1, null, false));
+        if (push != null) {
+            File file = new File(databasePath + uuid + ".db");
+            file.mkdirs();
+            dynamicDatasourceMapper.addDatasource(new Datasource(null, databasePath + uuid + ".db", "org.sqlite.JDBC", uuid));
+        }
     }
 
     @Override
@@ -331,10 +340,5 @@ public class DeviceManageServiceImpl implements DeviceManageService {
         } catch (Exception e) {
             throw new MyException(ResultEnum.DEFAULT_EXCEPTION);
         }
-    }
-
-    @Override
-    public List<Map<String, Object>> test() {
-        return monitoringDataMapper.test("7c156025-b4e5-4b0b-8a4a-e5462a4a6d31", "t202313");
     }
 }

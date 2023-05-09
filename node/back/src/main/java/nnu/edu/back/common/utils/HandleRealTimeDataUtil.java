@@ -56,11 +56,11 @@ public class HandleRealTimeDataUtil {
         }
     }
 
-    public static void normalHandle(byte[] bytes, MonitoringDataMapper monitoringDataMapper, String tableName) {
+    public static void normalHandle(String deviceId, byte[] bytes, MonitoringDataMapper monitoringDataMapper, String tableName) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String id = UUID.randomUUID().toString();
         String time = dateFormat.format(new Date());
-        monitoringDataMapper.insertMonitoringData(tableName, id, time, bytes);
+        monitoringDataMapper.insertMonitoringData(deviceId, tableName, id, time, bytes);
     }
 
 

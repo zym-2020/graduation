@@ -23,10 +23,8 @@ public class DynamicDatasourceServiceImpl implements DynamicDatasourceService {
     public void addDatasource(JSONObject jsonObject) {
         String jdbcUrl = jsonObject.getString("jdbcUrl");
         String driverClass = jsonObject.getString("driverClass");
-        String userName = jsonObject.getString("userName");
-        String password = jsonObject.getString("password");
         String deviceId = jsonObject.getString("deviceId");
-        Datasource datasource = new Datasource(null, jdbcUrl, driverClass, userName, password, deviceId);
+        Datasource datasource = new Datasource(null, jdbcUrl, driverClass, deviceId);
         dynamicDatasourceMapper.addDatasource(datasource);
     }
 }

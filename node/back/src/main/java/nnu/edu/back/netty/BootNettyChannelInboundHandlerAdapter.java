@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,8 +65,20 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         if (deviceConfig.getPush() != null) {
-            String tableName = deviceMapper.getTableName(deviceConfig.getId());
-            HandleRealTimeDataUtil.normalHandle(bytes, this.monitoringDataMapper, tableName);
+            String tableName;
+            LocalDateTime currentDate = LocalDateTime.now();
+            int year = currentDate.getYear();
+            int monthValue = currentDate.getMonthValue();
+            if (monthValue >= 1 && monthValue <= 3) {
+                tableName = "t" + year + "13";
+            } else if (monthValue >= 4 && monthValue <= 6) {
+                tableName = "t" + year + "46";
+            } else if (monthValue >= 7 && monthValue <= 9) {
+                tableName = "t" + year + "79";
+            } else {
+                tableName = "t" + year + "1012";
+            }
+            HandleRealTimeDataUtil.normalHandle(deviceConfig.getId(), bytes, this.monitoringDataMapper, tableName);
         }
 
         JSONObject jsonObject = new JSONObject();
@@ -117,7 +130,7 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
             String result = new String(bytes);
             handleMethod(bytes);
 
-            ctx.fireChannelRead(result);
+            ctx.fireChannelRead(bytes);
         }
 
     }

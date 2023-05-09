@@ -104,8 +104,4 @@ public class DeviceManageController {
         return ResultUtils.success();
     }
 
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public JsonResult test() {
-        return ResultUtils.success(deviceManageService.test());
-    }
 }

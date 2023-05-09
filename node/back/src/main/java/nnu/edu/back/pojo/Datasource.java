@@ -18,7 +18,5 @@ public class Datasource {
     String id;
     String jdbcUrl;
     String driverClass;
-    String userName;
-    String password;
     String deviceId;
 }

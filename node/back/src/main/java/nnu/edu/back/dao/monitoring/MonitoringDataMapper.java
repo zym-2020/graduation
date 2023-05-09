@@ -15,7 +15,7 @@ import java.util.Map;
  */
 @Repository
 public interface MonitoringDataMapper {
-    void insertMonitoringData(@Param("tableName") String tableName, @Param("id") String id, @Param("time") String time, @Param("data") byte[] bytes);
+    void insertMonitoringData(String deviceId, @Param("tableName") String tableName, @Param("id") String id, @Param("time") String time, @Param("data") byte[] bytes);
 
-    List<Map<String, Object>> test(String deviceId, @Param("tableName") String tableName);
+    void createTable(String deviceId, @Param("tableName") String tableName);
 }

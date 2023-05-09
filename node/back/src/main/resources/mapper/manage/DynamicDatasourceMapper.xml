@@ -5,16 +5,18 @@
         <id column="id" property="id"></id>
         <result column="jdbc_url" property="jdbcUrl"></result>
         <result column="driver_class" property="driverClass"></result>
-        <result column="user_name" property="userName"></result>
-        <result column="password" property="password"></result>
         <result column="device_id" property="deviceId"></result>
     </resultMap>
 
     <insert id="addDatasource">
-        insert into dynamic_datasource values(default, #{datasource.jdbcUrl}, #{datasource.driverClass}, #{datasource.userName}, #{datasource.password}, #{datasource.deviceId})
+        insert into dynamic_datasource values(default, #{datasource.jdbcUrl}, #{datasource.driverClass}, #{datasource.deviceId})
     </insert>
 
     <select id="queryDatasourceById" resultMap="DynamicDatasourceMap">
         select * from dynamic_datasource where device_id = #{deviceId}
+    </select>
+
+    <select id="queryAllDeviceId" resultType="java.lang.String">
+        select device_id as "deviceId" from dynamic_datasource
     </select>
 </mapper>

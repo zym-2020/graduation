@@ -10,6 +10,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,9 @@ import javax.sql.DataSource;
 @Aspect
 @Component
 public class DynamicDataSourceAspect {
+    @Value("databasePath")
+    String databasePath;
+
     @Autowired
     DynamicDatasourceMapper dynamicDatasourceMapper;
 
@@ -45,10 +49,8 @@ public class DynamicDataSourceAspect {
         if (!DataSourceContextHolder.containDataSourceKey(deviceId)) {
             DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
             Datasource datasource = dynamicDatasourceMapper.queryDatasourceById(deviceId);
-            dataSourceBuilder.url(datasource.getJdbcUrl());
+            dataSourceBuilder.url("jdbc:sqlite:" + databasePath + datasource.getJdbcUrl());
             dataSourceBuilder.driverClassName(datasource.getDriverClass());
-            dataSourceBuilder.username(datasource.getUserName());
-            dataSourceBuilder.password(datasource.getPassword());
             DataSource source = dataSourceBuilder.build();
             dynamicDataSource.addDataSource(deviceId, source);
         }
