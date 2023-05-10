@@ -1,6 +1,7 @@
 package nnu.edu.back.service.impl;
 
 import com.alibaba.fastjson2.JSONArray;
+import lombok.SneakyThrows;
 import nnu.edu.back.common.exception.MyException;
 import nnu.edu.back.common.result.ResultEnum;
 import nnu.edu.back.common.utils.FileUtil;
@@ -255,9 +256,21 @@ public class ReceiveRealTimeDataServiceImpl implements ReceiveRealTimeDataServic
             if (device.getPort() != null && device.getState() == 1) {
                 DeviceConfig deviceConfig = XmlUtil.fromXml(new File(configPath + device.getId() + ".xml"), DeviceConfig.class);
                 if (deviceConfig.getPush().getProtocol().equals("TCP")) {
-                    startTCPServer(device.getPort(), device.getId());
+                    new Thread() {
+                        @Override
+                        @SneakyThrows
+                        public void run() {
+                            startTCPServer(device.getPort(), device.getId());
+                        }
+                    }.start();
                 } else if (deviceConfig.getPush().getProtocol().equals("UDP")) {
-                    startUDPServer(device.getPort());
+                    new Thread() {
+                        @Override
+                        @SneakyThrows
+                        public void run() {
+                            startUDPServer(device.getPort());
+                        }
+                    }.start();
                 }
             }
         }
