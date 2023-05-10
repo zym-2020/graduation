@@ -29,7 +29,7 @@ import javax.sql.DataSource;
 @Aspect
 @Component
 public class DynamicDataSourceAspect {
-    @Value("databasePath")
+    @Value("${databasePath}")
     String databasePath;
 
     @Autowired

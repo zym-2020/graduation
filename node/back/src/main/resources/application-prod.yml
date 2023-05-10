@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    jdbc-url: jdbc:postgresql://localhost:5432/manage?stringtype=unspecified
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
+
+
+tempPath: C:/resource/node-manage/temp/
+configPath: C:/resource/node-manage/config/
+picturePath: C:/resource/node-manage/picture/
+dataPath: C:/resource/node-manage/data/
+scriptConfigPath: C:/resource/node-manage/scripts/
+databasePath: C:/resource/node-manage/database/

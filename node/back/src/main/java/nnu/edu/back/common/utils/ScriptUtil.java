@@ -22,6 +22,10 @@ public class ScriptUtil {
     private static String scriptPath = "D:/zhuomian/毕业/node-manage/scripts/";
     private static String tempPath = "D:/zhuomian/毕业/node-manage/temp/";
 
+//    private static String basePath = "C:/resource/node-manage/data/";
+//    private static String scriptPath = "C:/resource/node-manage/scripts/";
+//    private static String tempPath = "C:/resource/node-manage/temp/";
+
     public static String actionParamUtil(ActionStep actionStep, String data, String deviceId) throws Exception {
         String id = actionStep.getScript();
         File file = new File(scriptPath + id + "/scriptConfig.xml");

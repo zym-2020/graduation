@@ -11,7 +11,6 @@ spring:
 
 
 
-# 注意BootNettyChannelInboundHandlerAdapter类中datagramPath 手动修改
 # ScriptUtil 手动修改
 tempPath: D:/zhuomian/毕业/node-manage/temp/
 configPath: D:/zhuomian/毕业/node-manage/config/
